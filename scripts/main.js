@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
                 ? 'http://localhost:5000' 
-                : 'https://finpulse-backend-v2.onrender.com';
+                : 'https://finpulse-backend-v2.onrender.com/api';
 
             fetch(`${API_BASE}/contact`, {
                 method: "POST",
