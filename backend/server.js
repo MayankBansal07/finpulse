@@ -65,7 +65,7 @@ app.get("/", (req, res) => {
   res.send("Backend is live");
 });
 
-app.post('/contact', async (req, res) => {
+app.post('/api/contact', async (req, res) => {
   const { name, email, message } = req.body;
 
   if (!email || !email.includes("@") || !email.includes(".")) {
