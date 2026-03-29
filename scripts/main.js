@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? 'http://localhost:5000' 
                 : 'https://finpulse-backend-v2.onrender.com/api';
 
-            fetch(`${API_BASE}/contact`, {
+            fetch(`${API_BASE}/api/contact`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
