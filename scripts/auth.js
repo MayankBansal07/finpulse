@@ -71,11 +71,45 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Inject role toggle and update email label
+        const titleSec = document.querySelector('.login-card-subtitle');
+        let selectedRole = 'client';
+        if (titleSec && !document.getElementById('btnRoleClient')) {
+            const toggleHtml = `
+            <div style="display:flex; gap:10px; margin-bottom:15px; justify-content:center;">
+                <button type="button" id="btnRoleClient" style="flex:1; padding:8px; border-radius:6px; background:var(--primary); color:white; border:none; cursor:pointer;">Client Login</button>
+                <button type="button" id="btnRoleAdmin" style="flex:1; padding:8px; border-radius:6px; background:#f1f5f9; color:#475569; border:none; cursor:pointer;">Admin Login</button>
+            </div>
+            `;
+            titleSec.insertAdjacentHTML('afterend', toggleHtml);
+            
+            const btnC = document.getElementById('btnRoleClient');
+            const btnA = document.getElementById('btnRoleAdmin');
+            const emailLabel = exactLoginForm.querySelector('label');
+            const emailInput = exactLoginForm.querySelector('input');
+            
+            btnC.addEventListener('click', () => {
+                selectedRole = 'client';
+                btnC.style.background = 'var(--primary)'; btnC.style.color = 'white';
+                btnA.style.background = '#f1f5f9'; btnA.style.color = '#475569';
+                if(emailLabel) emailLabel.textContent = 'Email or Client ID (FNC-XXXX)';
+                if(emailInput) { emailInput.type = 'text'; emailInput.placeholder = 'you@example.com or FNC-1234'; }
+            });
+            btnA.addEventListener('click', () => {
+                selectedRole = 'admin';
+                btnA.style.background = 'var(--primary)'; btnA.style.color = 'white';
+                btnC.style.background = '#f1f5f9'; btnC.style.color = '#475569';
+                if(emailLabel) emailLabel.textContent = 'Admin Email';
+                if(emailInput) { emailInput.type = 'email'; emailInput.placeholder = 'admin@finpulse.com'; }
+            });
+            btnC.click();
+        }
+
         exactLoginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const emailInput = exactLoginForm.querySelector('input[type="email"]').value;
-            const currentPasswordInput = exactLoginForm.querySelector('input[style*="password"], input[type="password"], input[type="text"]').value;
+            const emailInputVal = exactLoginForm.querySelector('input').value;
+            const currentPasswordInput = exactLoginForm.querySelector('input[type="password"], input[type="text"]:not([placeholder*="FNC"])').value;
             const submitBtn = exactLoginForm.querySelector('button[type="submit"]');
             
             const originalText = submitBtn.innerHTML;
@@ -85,10 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const response = await fetch(`${API_URL}/auth/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email: emailInput, password: currentPasswordInput })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailInputVal, password: currentPasswordInput, role: selectedRole })
                 });
 
                 const data = await response.json();

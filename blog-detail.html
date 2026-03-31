@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinPulse | Blog Detail</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/lucide@latest/dist/umd/lucide.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .blog-detail-container { max-width: 800px; margin: 0 auto; padding: 8rem 2rem 5rem; }
+        .blog-header { margin-bottom: 2rem; }
+        .blog-title { font-size: 2.5rem; font-family: 'Outfit', sans-serif; font-weight: 700; color: #0f172a; margin-bottom: 1rem; line-height: 1.2; }
+        .blog-meta { display: flex; gap: 1.5rem; color: #64748b; font-size: 0.95rem; margin-bottom: 2rem; align-items: center; }
+        .blog-meta div { display: flex; align-items: center; gap: 0.4rem; }
+        .blog-image { width: 100%; height: auto; max-height: 500px; object-fit: cover; border-radius: 12px; margin-bottom: 3rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .blog-content { font-size: 1.1rem; line-height: 1.8; color: #334155; }
+        .back-link { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #3b82f6; font-weight: 500; margin-bottom: 2rem; transition: color 0.2s; }
+        .back-link:hover { color: #2563eb; }
+    </style>
+</head>
+<body style="background-color: var(--bg-light);">
+    <header id="header" class="navbar scrolled">
+        <div class="container nav-content">
+            <a href="index.html" class="logo" style="text-decoration: none;">
+                <img src="assets/finpulse_logo.jpg" alt="FinPulse Logo" style="height: 48px; width: 56px; object-fit: cover; border-radius: 8px;">
+                <span class="logo-text" style="color: #0f172a;">FinPulse</span>
+            </a>
+        </div>
+    </header>
+
+    <div class="blog-detail-container">
+        <a href="blogs.html" class="back-link"><i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i> Back to Blogs</a>
+        
+        <div id="loadingIndicator" style="text-align: center; padding: 4rem 0;">
+            <p>Loading blog content...</p>
+        </div>
+        
+        <div id="blogContentData" style="display: none;">
+            <div class="blog-header">
+                <h1 class="blog-title" id="dTitle"></h1>
+                <div class="blog-meta">
+                    <div><i data-lucide="user"></i> admin@finpulse.com</div>
+                    <div><i data-lucide="calendar"></i> <span id="dDate"></span></div>
+                </div>
+            </div>
+            <img src="" alt="Blog Cover" class="blog-image" id="dImage">
+            <div class="blog-content" id="dContent" style="white-space: pre-wrap;"></div>
+
+            <div class="comments-section" style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
+                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; margin-bottom: 1.5rem; color: #0f172a;">Comments</h3>
+                
+                <form id="commentForm" style="margin-bottom: 2rem;">
+                    <input type="text" id="commentName" placeholder="Your Name" style="width: 100%; padding: 0.75rem; box-sizing: border-box; margin-bottom: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; font-family: inherit; outline: none;" required>
+                    <textarea id="commentText" placeholder="Leave a comment..." rows="4" style="width: 100%; padding: 0.75rem; box-sizing: border-box; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem; resize: vertical; font-family: inherit; outline: none;" required></textarea>
+                    <button type="submit" style="background: #2563eb; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 500; font-family: inherit; transition: background 0.2s;">Post Comment</button>
+                </form>
+
+                <div id="commentsList" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+            const urlParams = new URLSearchParams(window.location.search);
+            const blogId = urlParams.get('id');
+
+            if (!blogId) {
+                document.getElementById('loadingIndicator').innerHTML = '<p style="color:red;">Invalid blog ID.</p>';
+                return;
+            }
+
+            const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+                ? 'http://localhost:5000/api' 
+                : 'https://finpulse-backend-v2.onrender.com/api';
+
+            try {
+                const res = await fetch(`${API_URL}/admin/blogs/${blogId}`);
+                if (!res.ok) throw new Error('Blog not found');
+                
+                const blog = await res.json();
+                
+                document.getElementById('dTitle').textContent = blog.title;
+                document.getElementById('dDate').textContent = new Date(blog.createdAt).toLocaleDateString();
+                document.getElementById('dImage').src = blog.image;
+                document.getElementById('dContent').textContent = blog.content || '';
+                
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('blogContentData').style.display = 'block';
+
+                // Initial render comments
+                renderComments(blog.comments || []);
+                
+                // Submit comment handler
+                document.getElementById('commentForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const text = document.getElementById('commentText').value;
+                    const user = document.getElementById('commentName').value;
+                    const btn = e.target.querySelector('button');
+                    const origBtn = btn.textContent;
+                    btn.textContent = 'Posting...';
+                    
+                    try {
+                        const resC = await fetch(`${API_URL}/admin/blogs/${blogId}/comments`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text, user })
+                        });
+                        if(resC.ok) {
+                            const updatedBlog = await resC.json();
+                            renderComments(updatedBlog.comments);
+                            e.target.reset();
+                        } else alert('Failed to post comment.');
+                    } catch(err) { alert(err.message); }
+                    finally { btn.textContent = origBtn; }
+                });
+                
+                // Helper to render comments
+                function renderComments(commentsArr) {
+                    const list = document.getElementById('commentsList');
+                    list.innerHTML = '';
+                    if(commentsArr.length === 0) {
+                        list.innerHTML = '<p style="color: #64748b;">No comments yet. Be the first!</p>';
+                        return;
+                    }
+                    const sorted = [...commentsArr].reverse();
+                    sorted.forEach(c => {
+                        const div = document.createElement('div');
+                        div.style.cssText = 'background: white; padding: 1.25rem; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);';
+                        const d = new Date(c.date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+                        div.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; margin-bottom:0.75rem; align-items: center;">
+                                <strong style="color: #0f172a; font-size: 1.05rem;"><i data-lucide="user-circle" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;"></i>${c.user}</strong>
+                                <small style="color: #64748b; font-size: 0.85rem;">${d}</small>
+                            </div>
+                            <p style="color: #334155; margin:0; line-height:1.6;">${c.text}</p>
+                        `;
+                        list.appendChild(div);
+                    });
+                    lucide.createIcons();
+                }
+
+            } catch(e) {
+                document.getElementById('loadingIndicator').innerHTML = `<p style="color:red;">Failed to grab blog: ${e.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

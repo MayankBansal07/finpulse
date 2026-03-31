@@ -6,124 +6,217 @@
     <title>FinPulse | Admin Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/lucide@latest/dist/umd/lucide.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles/main.css">
-    <style>
-        .admin-section { padding: 8rem 0 4rem; min-height: 100vh; background-color: var(--bg-light); }
-        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        
-        /* Table Styles */
-        .data-table-wrapper { overflow-x: auto; background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1rem; }
-        .data-table { width: 100%; border-collapse: collapse; text-align: left; }
-        .data-table th, .data-table td { padding: 1rem; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .data-table th { font-family: 'Outfit', sans-serif; font-weight: 600; color: var(--text-dark); background: rgba(0,0,0,0.02); }
-        .data-table tr:hover { background: rgba(0,0,0,0.01); }
-        
-        .status-badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600; }
-        .status-badge.new { background: #e3f2fd; color: #1976d2; }
-        .status-badge.admin { background: #fce4ec; color: #c2185b; }
-        .status-badge.client { background: #e8f5e9; color: #2e7d32; }
-
-        .form-group-inline { display: flex; gap: 1rem; margin-bottom: 1rem; align-items: flex-end;}
-    </style>
+    <link rel="stylesheet" href="styles/admin.css">
 </head>
 <body>
-    <header id="header" class="navbar scrolled">
-        <div class="container nav-content">
-            <a href="index.html" class="logo" style="text-decoration: none;">
-                <img src="assets/finpulse_logo.jpg" alt="FinPulse Logo" style="height: 48px; width: 56px; object-fit: cover; border-radius: 8px;">
-                <span class="logo-text">Fin<span class="text-primary">Pulse</span> Admin</span>
-            </a>
-            <div class="nav-actions">
-                <button id="logoutAdminBtn" class="btn btn-ghost nav-login">Logout</button>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/finpulse_logo.jpg" alt="FinPulse Logo" style="height: 32px; width: 36px; object-fit: cover; border-radius: 6px;">
+                <span style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700;">Fin<span style="color: #22c55e;">Pulse</span></span>
             </div>
-        </div>
-    </header>
+            
+            <nav class="sidebar-nav">
+                <a class="nav-item active" data-tab="overview">
+                    <i data-lucide="layout-grid"></i> Overview
+                </a>
+                <a class="nav-item" data-tab="manage-blogs">
+                    <i data-lucide="file-text"></i> Manage Blogs
+                </a>
+                <a class="nav-item" data-tab="manage-clients">
+                    <i data-lucide="users"></i> Manage Clients
+                </a>
+                <a class="nav-item" data-tab="activities">
+                    <i data-lucide="activity"></i> Activities
+                </a>
+            </nav>
 
-    <section class="admin-section">
-        <div class="container">
-            <div class="dashboard-header">
-                <h2>Admin <span class="text-primary">Dashboard</span></h2>
-                <div style="font-size: 1.1rem" id="adminWelcome"></div>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="logout-btn">
+                    <i data-lucide="log-out" style="width: 18px; height: 18px;"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="topbar">
+                <h1 id="pageTitle">Admin Dashboard</h1>
+                <div class="user-profile">
+                    <div class="avatar" id="userAvatar">A</div>
+                    <span id="userEmailDisplay">admin@finpulse.com</span>
+                </div>
             </div>
 
-            <div class="dashboard-grid">
-                
-                <!-- Consultation Form Submissions -->
-                <div>
-                    <h3>Recent Consultations</h3>
-                    <p style="margin-bottom: 1rem; color: #666;">Forms submitted from the contact page.</p>
-                    <div class="data-table-wrapper">
-                        <table class="data-table">
+            <!-- Tab: Overview -->
+            <div id="overview" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Clients</h3>
+                        <p class="value" id="statClients">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Admin Users</h3>
+                        <p class="value" id="statAdmins">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Published Blogs</h3>
+                        <p class="value" id="statBlogs">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Manage Blogs -->
+            <div id="manage-blogs" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-family:'Outfit', sans-serif; margin:0;">Manage Blogs</h2>
+                    <button class="btn-sm btn-success" id="btnNewBlog" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="plus" style="width: 16px; height: 16px;"></i> New Blog
+                    </button>
+                </div>
+
+                <!-- New Blog Form (Hidden by default) -->
+                <div class="panel" id="newBlogPanel" style="display: none;">
+                    <div class="panel-header">
+                        <h2>Create New Blog</h2>
+                    </div>
+                    <form id="createBlogForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Blog Title *</label>
+                                <input type="text" id="blogTitle" required placeholder="Enter blog title">
+                            </div>
+                            <div class="form-group">
+                                <label>Blog Content *</label>
+                                <textarea id="blogContent" required placeholder="Write your blog content here..." style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; outline: none; box-sizing: border-box; resize: vertical; min-height: 120px; font-family: inherit; font-size: inherit;"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Cover Image *</label>
+                                <div class="file-upload-wrapper" onclick="document.getElementById('blogImageInput').click()">
+                                    <i data-lucide="upload-cloud" style="width: 32px; height: 32px; color: #94a3b8; margin-bottom: 0.5rem;"></i>
+                                    <p style="margin:0; font-size: 0.875rem; color: #64748b;">Click to upload image</p>
+                                    <input type="file" id="blogImageInput" accept="image/*" style="display: none;">
+                                    <img id="imagePreview" alt="Preview">
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="submit" class="btn-sm btn-success" id="btnPublishBlog">Publish Blog</button>
+                            <button type="button" class="btn-sm" style="background: white; border: 1px solid #e2e8f0;" id="btnCancelBlog">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Blogs List -->
+                <div class="panel" id="blogsListPanel">
+                    <div class="panel-header">
+                        <h2>Existing Blogs</h2>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
                             <thead>
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Service</th>
-                                    <th>Message</th>
-                                    <th>Status</th>
+                                    <th>Title</th>
+                                    <th>Date Published</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="consultationsTableBody">
-                                <tr><td colspan="7">Loading...</td></tr>
+                            <tbody id="blogsTableBody">
+                                <tr><td colspan="3">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+            </div>
 
-                <!-- Create Client / View Clients -->
-                <div style="margin-top: 2rem;">
-                    <h3>Manage Clients</h3>
-                    
-                    <!-- Add form inline -->
-                    <div class="glass-card" style="margin-bottom: 1.5rem; padding: 1.5rem;">
-                        <h4>Create New Client</h4>
-                        <form id="createClientForm" class="form-group-inline" style="flex-wrap: wrap;">
-                            <div class="form-group" style="margin: 0; min-width: 200px; flex: 1;">
-                                <label>Name</label>
-                                <input type="text" id="newClientName" required>
-                            </div>
-                            <div class="form-group" style="margin: 0; min-width: 200px; flex: 1;">
-                                <label>Email</label>
-                                <input type="email" id="newClientEmail" required>
-                            </div>
-                            <div class="form-group" style="margin: 0; min-width: 150px; flex: 1;">
-                                <label>Phone</label>
-                                <input type="text" id="newClientPhone">
-                            </div>
-                            <div class="form-group" style="margin: 0; min-width: 150px; flex: 1;">
-                                <label>Password</label>
-                                <input type="text" id="newClientPassword" placeholder="Default: client123">
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="height: 48px;"><i data-lucide="plus"></i> Add</button>
-                        </form>
+            <!-- Tab: Manage Clients -->
+            <div id="manage-clients" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-family:'Outfit', sans-serif; margin:0;">Manage VIP Clients</h2>
+                    <button class="btn-sm btn-success" id="btnGenerateClient" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i> Generate Client
+                    </button>
+                </div>
+
+                <!-- Create Client Form (Hidden by default) -->
+                <div class="panel" id="newClientPanel" style="display: none;">
+                    <div class="panel-header">
+                        <h2>Mint New Client Account</h2>
                     </div>
+                    <form id="createClientForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Client Full Name *</label>
+                                <input type="text" id="clientName" required placeholder="John Doe">
+                            </div>
+                            <div class="form-group">
+                                <label>Client Email (Optional - For notifications)</label>
+                                <input type="email" id="clientEmail" placeholder="client@company.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Secure Initial Password *</label>
+                                <input type="text" id="clientPassword" required placeholder="Pass123! Verify locally">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="submit" class="btn-sm btn-success" style="display: flex; align-items:center; gap:0.5rem;">Issue Credentials <i data-lucide="key" style="width:14px;height:14px;"></i></button>
+                            <button type="button" class="btn-sm btn-outline-success" id="btnCancelClient">Cancel</button>
+                        </div>
+                    </form>
+                </div>
 
-                    <div class="data-table-wrapper">
-                        <table class="data-table">
+                <!-- Clients List -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Active Client Portfolio</h2>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
                             <thead>
                                 <tr>
-                                    <th>Joined</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Role</th>
+                                    <th>Client Name</th>
+                                    <th>Secure Client ID</th>
+                                    <th>Linked Email</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="clientsTableBody">
-                                <tr><td colspan="5">Loading...</td></tr>
+                                <tr><td colspan="4">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-
             </div>
-        </div>
-    </section>
+
+            <!-- Tab: Activities -->
+            <div id="activities" class="tab-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Recent User Activities</h2>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User Email</th>
+                                    <th>Role</th>
+                                    <th>Action</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activitiesTableBody">
+                                <tr><td colspan="4">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="scripts/admin.js"></script>
