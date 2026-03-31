@@ -105,6 +105,25 @@ document.addEventListener('DOMContentLoaded', () => {
             btnC.click();
         }
 
+        // Cleanup Google Login and Divider
+        const googleBtn = exactLoginForm.parentElement.querySelector('.btn-google');
+        if (googleBtn) googleBtn.remove();
+        const loginDivider = exactLoginForm.parentElement.querySelector('.login-divider');
+        if (loginDivider) loginDivider.remove();
+
+        // Update Signup Prompt to Register Here
+        const signupPrompt = exactLoginForm.parentElement.querySelector('.signup-prompt');
+        if (signupPrompt) {
+            signupPrompt.innerHTML = `Don't have an account? <a href="index.html#contact" id="registerLink">Register here</a>`;
+            const rl = document.getElementById('registerLink');
+            if(rl) {
+                rl.addEventListener('click', () => {
+                    loginOverlay.classList.add('hidden');
+                    document.body.style.overflow = '';
+                });
+            }
+        }
+
         exactLoginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
