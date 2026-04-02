@@ -9,7 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5005;
 
 connectDB();
 
@@ -22,8 +22,10 @@ const allowedOrigins = [
   "http://localhost:5500",
   "http://127.0.0.1:5502",
   "http://localhost:5502",
-  "http://localhost:5000",
-  "http://127.0.0.1:5000"
+  "http://localhost:5005",
+  "http://127.0.0.1:5005",
+  "http://127.0.0.1:8080",
+  "http://localhost:8080"
 ];
 
 app.use(cors({

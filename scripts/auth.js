@@ -5,7 +5,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Dynamically set API URL based on environment
     const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-        ? 'http://localhost:5000/api' 
+        ? 'http://localhost:5005/api' 
         : 'https://finpulse-backend-v2.onrender.com/api';
 
     // UI Elements
