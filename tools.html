@@ -54,192 +54,53 @@
         </div>
     </header>
 
-    <!-- Tools Section -->
+    <!-- Tools Hub Section -->
     <section id="tools" class="tools-section">
         <div class="container">
-            <div class="tools-layout">
-                <div class="tools-sidebar fade-in">
-                    <div class="tool-list-item active">
-                        <div class="tool-icon-small"><i data-lucide="calculator"></i></div>
-                        <div class="tool-text">
-                            <h3>Tax Calculator</h3>
-                            <p>Estimate your income tax liability across different regimes instantly.</p>
-                        </div>
-                        <i data-lucide="chevron-right" class="arrow"></i>
-                    </div>
-                    <div class="tool-list-item">
-                        <div class="tool-icon-small"><i data-lucide="percent"></i></div>
-                        <div class="tool-text">
-                            <h3>EMI Calculator</h3>
-                            <p>Plan your loan repayments with precise EMI breakdowns.</p>
-                        </div>
-                        <i data-lucide="chevron-right" class="arrow"></i>
-                    </div>
-                    <div class="tool-list-item">
-                        <div class="tool-icon-small"><i data-lucide="heart-pulse"></i></div>
-                        <div class="tool-text">
-                            <h3>Financial Health Check</h3>
-                            <p>Get a comprehensive score of your financial wellness.</p>
-                        </div>
-                        <i data-lucide="chevron-right" class="arrow"></i>
-                    </div>
-                </div>
-                
-                <div class="tool-main-content glass-card fade-in">
-                    <!-- Tax Calculator UI -->
-                    <div class="tool-ui-section active" id="ui-tax">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                            <h2>Tax Calculator</h2>
-                            <span style="background: rgba(46, 204, 113, 0.1); color: #2ecc71; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(46, 204, 113, 0.3);">FY 2026-27</span>
-                        </div>
-                        <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem;">Estimate your income tax liability across different regimes as per latest budget updates.</p>
-                        
-                        <div class="input-group">
-                            <label>Annual Gross Salary (₹)</label>
-                            <div class="range-container">
-                                <input type="range" id="incomeSlider" min="0" max="10000000" step="50000" value="2000000">
-                                <div class="slider-labels">
-                                    <span>₹0</span>
-                                    <span id="incomeDisplay" style="font-weight: 700; color: var(--primary);">₹20,00,000</span>
-                                    <span>₹1Cr+</span>
-                                </div>
-                            </div>
-                        </div>
+            <div class="section-header text-center fade-in">
+                <h2 style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 2.8rem; margin-bottom: 1rem;">Financial <span class="text-primary">Tool Hub</span></h2>
+                <p style="color: #64748b; font-size: 1.1rem; max-width: 700px; margin: 0 auto 3rem;">Access our suite of professional financial calculators and health assessment tools, designed for precision and transparency.</p>
+            </div>
 
-                        <!-- Advanced Deductions -->
-                        <div id="deductionsPanel" style="margin-top: 1.5rem; background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0;">
-                            <h4 style="font-family: 'Outfit', sans-serif; font-size: 0.9rem; margin-bottom: 1rem; color: #1e293b;">Deductions (Old Regime only)</h4>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                                <div class="input-group">
-                                    <label style="font-size: 0.75rem;">Section 80C (LIC, PPF...)</label>
-                                    <input type="number" id="input80C" value="0" step="5000" max="150000" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px;">
-                                </div>
-                                <div class="input-group">
-                                    <label style="font-size: 0.75rem;">HRA/Home Loan Interest</label>
-                                    <input type="number" id="inputDeductionOther" value="0" step="5000" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px;">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="regime-toggle" style="margin-top: 1.5rem;">
-                            <button class="toggle-btn active" data-regime="new">New Regime</button>
-                            <button class="toggle-btn" data-regime="old">Old Regime</button>
-                        </div>
-
-                        <div class="tax-result-card" style="background: white; border: 1px solid #e2e8f0; padding: 1.5rem; border-radius: 12px; margin-top: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed #e2e8f0;">
-                                <span style="color: #64748b; font-size: 0.9rem;">Estimated Tax Liability</span>
-                                <strong id="taxResultValue" style="font-size: 1.75rem; color: var(--primary);">₹1,92,400</strong>
-                            </div>
-                            
-                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; text-align: center;">
-                                <div style="padding: 0.5rem;">
-                                    <span style="display: block; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Base Tax</span>
-                                    <span id="resBaseTax" style="font-weight: 600; font-size: 0.95rem; color: #1e293b;">₹1,85,000</span>
-                                </div>
-                                <div style="padding: 0.5rem;">
-                                    <span style="display: block; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Surcharge</span>
-                                    <span id="resSurcharge" style="font-weight: 600; font-size: 0.95rem; color: #1e293b;">₹0</span>
-                                </div>
-                                <div style="padding: 0.5rem;">
-                                    <span style="display: block; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Cess (4%)</span>
-                                    <span id="resCess" style="font-weight: 600; font-size: 0.95rem; color: #1e293b;">₹7,400</span>
-                                </div>
-                            </div>
-
-                            <div id="savingsPanel" style="margin-top: 1.5rem; background: #ecfdf5; border: 1px solid #10b981; padding: 0.75rem; border-radius: 8px; text-align: center;">
-                                <span style="color: #065f46; font-size: 0.85rem; font-weight: 500;">
-                                    <i data-lucide="sparkles" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>
-                                    You save <strong id="savingsAmount">₹2,21,000</strong> compared to Old Regime!
-                                </span>
-                            </div>
-                        </div>
+            <div class="tools-grid-hub fade-in" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+                <!-- Tax Calculator Card -->
+                <a href="tax-calculator.html" class="tool-hub-card glass-card" style="text-decoration: none; display: flex; flex-direction: column; padding: 2.5rem; transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%; border: 1px solid #e2e8f0; border-radius: 20px;">
+                    <div style="width: 64px; height: 64px; background: rgba(31, 87, 195, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: var(--primary);">
+                        <i data-lucide="calculator" style="width: 32px; height: 32px;"></i>
                     </div>
-
-                    <!-- EMI Calculator UI -->
-                    <div class="tool-ui-section" id="ui-emi" style="display: none;">
-                        <h2>EMI Calculator</h2>
-                        <div class="input-group">
-                            <label>Loan Amount (₹)</label>
-                            <div class="range-container">
-                                <input type="range" id="emiLoanAmount" min="100000" max="10000000" step="100000" value="2000000">
-                                <div class="slider-labels" style="justify-content: flex-end;">
-                                    <span id="loanAmountDisplay" style="font-weight: 700;">₹20,00,000</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="input-group" style="margin-top: 1.5rem;">
-                            <label>Interest Rate (%)</label>
-                            <div class="range-container">
-                                <input type="range" id="emiInterestRate" min="5" max="20" step="0.1" value="8.5">
-                                <div class="slider-labels" style="justify-content: flex-end;">
-                                    <span id="interestRateDisplay" style="font-weight: 700;">8.5%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="input-group" style="margin-top: 1.5rem;">
-                            <label>Tenure (Years)</label>
-                            <div class="range-container">
-                                <input type="range" id="emiTenure" min="1" max="30" step="1" value="20">
-                                <div class="slider-labels" style="justify-content: flex-end;">
-                                    <span id="tenureDisplay" style="font-weight: 700;">20 years</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="emi-result-cards" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 2.5rem;">
-                            <div class="result-box" style="background: rgba(46, 204, 113, 0.08); padding: 1.5rem 1rem; border-radius: 12px; text-align: center; border: 1px solid rgba(46, 204, 113, 0.2);">
-                                <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Monthly EMI</span>
-                                <strong id="emiMonthly" style="font-size: 1.4rem; color: var(--primary);">₹17,356</strong>
-                            </div>
-                            <div class="result-box" style="background: #f8fafc; border: 1px solid var(--border-light); padding: 1.5rem 1rem; border-radius: 12px; text-align: center;">
-                                <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Total Interest</span>
-                                <strong id="emiTotalInterest" style="font-size: 1.2rem; color: #1e3a8a;">₹21,65,552</strong>
-                            </div>
-                            <div class="result-box" style="background: #f8fafc; border: 1px solid var(--border-light); padding: 1.5rem 1rem; border-radius: 12px; text-align: center;">
-                                <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Total Payment</span>
-                                <strong id="emiTotalPayment" style="font-size: 1.2rem; color: #1e3a8a;">₹41,65,552</strong>
-                            </div>
-                        </div>
+                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; margin-bottom: 1rem; color: #0f172a;">Income Tax Calculator</h3>
+                    <p style="color: #64748b; line-height: 1.6; margin-bottom: 2rem; flex-grow: 1;">A comprehensive 4-step wizard to compare New and Old regimes precisely for FY 2026-27 calculations.</p>
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--primary);">
+                        Launch Tool <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
                     </div>
+                </a>
 
-                    <!-- Financial Health Check UI -->
-                    <div class="tool-ui-section" id="ui-health" style="display: none;">
-                        <h2>Financial Health Check</h2>
-                        <div class="input-group">
-                            <label>Savings Rate</label>
-                            <div class="range-container">
-                                <input type="range" id="healthSavings" min="0" max="100" value="50">
-                                <div class="slider-labels" style="justify-content: flex-end;"><span id="savingsDisplay" style="font-weight: 700;">50%</span></div>
-                            </div>
-                        </div>
-                        <div class="input-group" style="margin-top: 1.5rem;">
-                            <label>Debt-to-Income</label>
-                            <div class="range-container">
-                                <input type="range" id="healthDebt" min="0" max="100" value="30">
-                                <div class="slider-labels" style="justify-content: flex-end;"><span id="debtDisplay" style="font-weight: 700;">30%</span></div>
-                            </div>
-                        </div>
-                        <div class="input-group" style="margin-top: 1.5rem;">
-                            <label>Insurance Coverage</label>
-                            <div class="range-container">
-                                <input type="range" id="healthInsurance" min="0" max="100" value="70">
-                                <div class="slider-labels" style="justify-content: flex-end;"><span id="insuranceDisplay" style="font-weight: 700;">70%</span></div>
-                            </div>
-                        </div>
-                        <div class="input-group" style="margin-top: 1.5rem;">
-                            <label>Investment Diversification</label>
-                            <div class="range-container">
-                                <input type="range" id="healthInvestment" min="0" max="100" value="40">
-                                <div class="slider-labels" style="justify-content: flex-end;"><span id="investmentDisplay" style="font-weight: 700;">40%</span></div>
-                            </div>
-                        </div>
-                        <div class="health-result-card" style="margin-top: 2rem; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); padding: 2rem; border-radius: 12px; text-align: center;">
-                            <span style="font-size: 0.95rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Health Score</span>
-                            <div id="healthScoreDisplay" style="font-size: 2.5rem; font-weight: 700; color: #f59e0b; margin-bottom: 0.5rem;">57/100</div>
-                            <span id="healthScoreLabel" style="color: #f59e0b; font-weight: 600;">Good</span>
-                        </div>
+                <!-- EMI Calculator Card -->
+                <a href="emi-calculator.html" class="tool-hub-card glass-card" style="text-decoration: none; display: flex; flex-direction: column; padding: 2.5rem; transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%; border: 1px solid #e2e8f0; border-radius: 20px;">
+                    <div style="width: 64px; height: 64px; background: rgba(16, 185, 129, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: #10b981;">
+                        <i data-lucide="percent" style="width: 32px; height: 32px;"></i>
                     </div>
-                </div>
+                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; margin-bottom: 1rem; color: #0f172a;">EMI Calculator</h3>
+                    <p style="color: #64748b; line-height: 1.6; margin-bottom: 2rem; flex-grow: 1;">Plan your loan repayments with interactive breakdowns and generated amortization schedules.</p>
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #10b981;">
+                        Launch Tool <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                    </div>
+                </a>
+
+                <!-- Financial Health Card -->
+                <a href="financial-health.html" class="tool-hub-card glass-card" style="text-decoration: none; display: flex; flex-direction: column; padding: 2.5rem; transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%; border: 1px solid #e2e8f0; border-radius: 20px;">
+                    <div style="width: 64px; height: 64px; background: rgba(59, 130, 246, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: #3b82f6;">
+                        <i data-lucide="heart-pulse" style="width: 32px; height: 32px;"></i>
+                    </div>
+                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; margin-bottom: 1rem; color: #0f172a;">Health Check</h3>
+                    <p style="color: #64748b; line-height: 1.6; margin-bottom: 2rem; flex-grow: 1;">A comprehensive assessment to evaluate your financial wellness, coverage, and stability scores.</p>
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #3b82f6;">
+                        Launch Tool <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
             </div>
         </div>
     </section>

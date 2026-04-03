@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Professional EMI Calculator. Plan your loan repayments with precise monthly breakdowns and amortization schedules.">
+    <title>EMI Calculator | FinPulse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://unpkg.com/lucide@latest/dist/umd/lucide.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/tools.css">
+    <link rel="icon" type="image/jpeg" href="assets/finpulse_logo.jpg">
+</head>
+
+<body class="bg-light">
+
+    <!-- Navigation -->
+    <header id="header" class="navbar scrolled">
+        <div class="container nav-content">
+            <a href="index.html" class="logo" style="text-decoration: none;">
+                <img src="assets/finpulse_logo.jpg" alt="FinPulse Logo" style="height: 48px; width: 56px; object-fit: cover; border-radius: 8px;">
+                <span class="logo-text">Fin<span class="text-primary">Pulse</span></span>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="services.html">Services</a>
+                <a href="tools.html">Tools</a>
+                <a href="about.html">About</a>
+                <a href="blogs.html">Blogs</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="tools.html" class="btn btn-ghost"><i data-lucide="arrow-left"></i> All Tools</a>
+            </div>
+            <button class="mobile-menu-btn" aria-label="Toggle Menu">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="tool-page-container">
+        <div class="container">
+            <div class="text-center" style="margin-bottom: 2.5rem;">
+                <h1 style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 2.5rem; margin-bottom: 0.5rem; color: #0f172a;">EMI <span class="text-primary">Calculator</span></h1>
+                <p style="color: #64748b; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Plan your loans with precision. Get instant monthly EMI and total interest breakdowns.</p>
+            </div>
+
+            <div class="wizard-card" style="max-width: 1000px;">
+                <div class="form-group-grid" style="grid-template-columns: 1fr 1fr; gap: 3rem;">
+                    <!-- Inputs -->
+                    <div class="emi-inputs">
+                        <div class="form-field">
+                            <label>Loan Amount (₹)</label>
+                            <input type="number" id="emiLoanAmount" value="2000000" step="50000">
+                        </div>
+                        <div class="form-field" style="margin-top: 1.5rem;">
+                            <label>Interest Rate (%)</label>
+                            <input type="number" id="emiInterestRate" value="8.5" step="0.1">
+                        </div>
+                        <div class="form-field" style="margin-top: 1.5rem;">
+                            <label>Tenure (Years)</label>
+                            <input type="number" id="emiTenure" value="20">
+                        </div>
+                    </div>
+
+                    <!-- Instant Results -->
+                    <div class="emi-results" style="background: #f8fafc; padding: 2rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+                        <span style="color: #64748b; font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Monthly EMI</span>
+                        <div id="emiMonthly" style="font-size: 2.5rem; color: var(--primary); font-weight: 700; margin-bottom: 1.5rem;">₹17,356</div>
+                        
+                        <div style="border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                                <span style="color: #64748b;">Total Interest</span>
+                                <strong id="emiTotalInterest" style="color: #1e293b;">₹21,65,552</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #64748b;">Total Payment</span>
+                                <strong id="emiTotalPayment" style="color: #1e293b;">₹41,65,552</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Amortization Schedule -->
+                <div id="amortizationWrapper" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #f1f5f9;">
+                    <h3 style="font-family: 'Outfit', sans-serif; margin-bottom: 1.5rem;">Amortization Schedule</h3>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <table class="comparison-table" style="font-size: 0.9rem;">
+                            <thead>
+                                <tr style="position: sticky; top: 0; background: #fff; z-index: 10;">
+                                    <th>Month</th>
+                                    <th>Principal (A)</th>
+                                    <th>Interest (B)</th>
+                                    <th>Total (A+B)</th>
+                                    <th>Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="amortizationBody">
+                                <!-- Generated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-exact">
+        <div class="container text-center">
+            <p>&copy; 2026 FinPulse. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="scripts/emi-calculator.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Professional Income Tax Calculator for FY 2026-27. Compare New and Old regimes with full accuracy.">
+    <title>Income Tax Calculator | FinPulse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://unpkg.com/lucide@latest/dist/umd/lucide.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/tools.css">
+    <link rel="icon" type="image/jpeg" href="assets/finpulse_logo.jpg">
+</head>
+
+<body class="bg-light">
+
+    <!-- Navigation -->
+    <header id="header" class="navbar scrolled">
+        <div class="container nav-content">
+            <a href="index.html" class="logo" style="text-decoration: none;">
+                <img src="assets/finpulse_logo.jpg" alt="FinPulse Logo" style="height: 48px; width: 56px; object-fit: cover; border-radius: 8px;">
+                <span class="logo-text">Fin<span class="text-primary">Pulse</span></span>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="services.html">Services</a>
+                <a href="tools.html">Tools</a>
+                <a href="about.html">About</a>
+                <a href="blogs.html">Blogs</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="tools.html" class="btn btn-ghost"><i data-lucide="arrow-left"></i> All Tools</a>
+            </div>
+            <button class="mobile-menu-btn" aria-label="Toggle Menu">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="tool-page-container">
+        <div class="container">
+            <div class="text-center" style="margin-bottom: 2.5rem;">
+                <h1 style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 2.5rem; margin-bottom: 0.5rem; color: #0f172a;">Income Tax <span class="text-primary">Calculator</span></h1>
+                <p style="color: #64748b; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Calculate your taxes precisely for the latest budget with our professional tool.</p>
+            </div>
+
+            <!-- Stepper -->
+            <div class="stepper" id="taxStepper">
+                <div class="step-item active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <span class="step-label">Basic Details</span>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div class="step-circle">2</div>
+                    <span class="step-label">Income Details</span>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div class="step-circle">3</div>
+                    <span class="step-label">Deductions</span>
+                </div>
+                <div class="step-item" data-step="4">
+                    <div class="step-circle">4</div>
+                    <span class="step-label">Summary</span>
+                </div>
+            </div>
+
+            <!-- Form Wizard -->
+            <form id="taxWizardForm" class="wizard-card">
+                <!-- Print Specific Header -->
+                <div class="print-header">
+                    <div style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                        <img src="assets/finpulse_logo.jpg" alt="FinPulse Logo" class="print-logo" style="border-radius: 8px;">
+                        <div>
+                            <h2 style="font-family: 'Outfit', sans-serif; font-weight: 800; color: #0f172a; margin: 0;">FinPulse</h2>
+                            <p style="color: #64748b; font-size: 0.8rem; margin: 0;">Expert Financial Solutions</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <h4 style="font-family: 'Outfit', sans-serif; font-weight: 600; margin: 0;">Income Tax Report</h4>
+                        <p style="color: #64748b; font-size: 0.8rem; margin: 0;">FY 2026-27 (AY 2027-28)</p>
+                    </div>
+                </div>
+                
+                <!-- Step 1: Basic Details -->
+
+                <div class="wizard-step active" id="step1">
+                    <h3 style="margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif;">Step 1: Financial Year & Age</h3>
+                    <div class="form-group-grid">
+                        <div class="form-field">
+                            <label>Financial Year</label>
+                            <select id="fySelect" class="form-select">
+                                <option value="2026-27" selected>FY 2026-27 (Latest Budget)</option>
+                                <option value="2025-26">FY 2025-26</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>Age Group</label>
+                            <select id="ageCategory" class="form-select">
+                                <option value="below-60">Below 60 Years</option>
+                                <option value="senior">60 to 80 Years (Senior Citizen)</option>
+                                <option value="super-senior">Above 80 Years (Super Senior)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Income Details -->
+                <div class="wizard-step" id="step2">
+                    <h3 style="margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif;">Step 2: Income Details</h3>
+                    <div class="form-group-grid">
+                        <div class="form-field">
+                            <label>Taxable Salary (Annual) <i data-lucide="info" style="width:14px; color: #94a3b8;"></i></label>
+                            <input type="number" id="incomeSalary" placeholder="0" value="2000000">
+                        </div>
+                        <div class="form-field">
+                            <label>Inc. from Interest / Other <i data-lucide="info" style="width:14px; color: #94a3b8;"></i></label>
+                            <input type="number" id="incomeOther" placeholder="0" value="0">
+                        </div>
+                        <div class="form-field">
+                            <label>Rental Income (p.a.)</label>
+                            <input type="number" id="incomeRental" placeholder="0" value="0">
+                        </div>
+                        <div class="form-field">
+                            <label>Digital Asset Income (Crypto)</label>
+                            <input type="number" id="incomeCrypto" placeholder="0" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Deductions -->
+                <div class="wizard-step" id="step3">
+                    <h3 style="margin-bottom: 1.5rem; font-family: 'Outfit', sans-serif;">Step 3: Deductions & Exemptions</h3>
+                    <div class="form-group-grid">
+                        <div class="form-field">
+                            <label>Section 80C (LIC, PPF...)</label>
+                            <input type="number" id="ded80C" placeholder="Max 1,50,000" value="0">
+                        </div>
+                        <div class="form-field">
+                            <label>Self occupied Home Loan Int.</label>
+                            <input type="number" id="dedHomeLoan" placeholder="Max 2,00,000" value="0">
+                        </div>
+                        <div class="form-field">
+                            <label>Section 80D (Medical Ins...)</label>
+                            <input type="number" id="ded80D" placeholder="0" value="0">
+                        </div>
+                        <div class="form-field">
+                            <label>NPS [80CCD(1B) & (2)]</label>
+                            <input type="number" id="dedNPS" placeholder="0" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Summary -->
+                <div class="wizard-step" id="step4">
+                    <div id="bestRegimeBanner" class="result-banner">
+                        <div style="background: #10b981; color: white; padding: 12px; border-radius: 50%; display: flex;">
+                            <i data-lucide="trending-up"></i>
+                        </div>
+                        <div>
+                            <h4 style="color: #065f46; font-size: 1.1rem; margin-bottom: 4px;">Recommended: New Regime</h4>
+                            <p style="color: #059669; font-size: 0.9rem;">You save <strong>₹2,21,000</strong> over the Old Regime.</p>
+                        </div>
+                    </div>
+
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Old Regime</th>
+                                <th>New Regime</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparisonTableBody">
+                            <tr>
+                                <td>Gross Total Income</td>
+                                <td id="resOldGross">₹20,00,000</td>
+                                <td id="resNewGross">₹20,00,000</td>
+                            </tr>
+                            <tr>
+                                <td>Exempt Allowances</td>
+                                <td id="resOldExempt">₹0</td>
+                                <td id="resNewExempt">₹0</td>
+                            </tr>
+                            <tr>
+                                <td>Standard Deductions</td>
+                                <td id="resOldStdDeduc">₹50,000</td>
+                                <td id="resNewStdDeduc">₹75,000</td>
+                            </tr>
+                            <tr>
+                                <td>Chapter VI A Deductions</td>
+                                <td id="resOldVIA">₹0</td>
+                                <td id="resNewVIA">₹0</td>
+                            </tr>
+                            <tr>
+                                <td>Taxable Income</td>
+                                <td id="resOldTaxable">₹19,50,000</td>
+                                <td id="resNewTaxable">₹19,25,000</td>
+                            </tr>
+                            <tr>
+                                <td>Income Tax</td>
+                                <td id="resOldBaseTax">₹3,97,500</td>
+                                <td id="resNewBaseTax">₹1,85,000</td>
+                            </tr>
+                            <tr>
+                                <td>Health & Education Cess (4%)</td>
+                                <td id="resOldCess">₹15,900</td>
+                                <td id="resNewCess">₹7,400</td>
+                            </tr>
+                            <tr class="table-row-total">
+                                <td>Total Tax Liability</td>
+                                <td id="resOldTotal" style="color: #ef4444;">₹4,13,400</td>
+                                <td id="resNewTotal" style="color: #10b981;">₹1,92,400</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Actions -->
+                <div class="wizard-actions">
+                    <button type="button" id="prevBtn" class="btn btn-secondary" style="visibility: hidden;"><i data-lucide="chevron-left"></i> Back</button>
+                    <button type="button" id="nextBtn" class="btn btn-primary">Go to Next Step <i data-lucide="chevron-right"></i></button>
+                    <button type="submit" id="submitBtn" class="btn btn-primary" style="display: none;">Generate Report <i data-lucide="download"></i></button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-exact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col brand-col">
+                    <a href="index.html" class="logo" style="text-decoration: none;">
+                        <img src="assets/finpulse_logo.jpg" alt="FinPulse Logo" style="height: 48px; width: 56px; object-fit: cover; border-radius: 8px;">
+                        <span class="logo-text" style="color: white; font-weight: 700;">FinPulse</span>
+                    </a>
+                    <p class="footer-desc">Expert Chartered Accountant services tailored for modern businesses.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="tools.html">Tool Hub</a></li>
+                        <li><a href="blogs.html">Blogs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col contact-col">
+                    <h4>Contact</h4>
+                    <ul class="footer-contact-info">
+                        <li><i data-lucide="map-pin"></i> DLF phase 1 gurgaon 122001</li>
+                        <li><i data-lucide="phone"></i> +91 9509899680</li>
+                        <li><i data-lucide="mail"></i> consult@finpulse.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 FinPulse. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="scripts/tax-calculator.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+</body>
+
+</html>
