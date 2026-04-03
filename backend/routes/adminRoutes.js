@@ -103,7 +103,7 @@ router.put('/clients/:id/password', protect, admin, async (req, res) => {
 // @route   GET /api/admin/blogs
 router.get('/blogs', async (req, res) => {
   try {
-    const blogs = await Blog.find({}).sort({ createdAt: -1 }).allowDiskUse(true);
+    const blogs = await Blog.find({}).select('-image').sort({ createdAt: -1 });
     res.json(blogs);
   } catch (error) {
     console.error('Error fetching blogs:', error);
