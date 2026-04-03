@@ -88,28 +88,71 @@
                 <div class="tool-main-content glass-card fade-in">
                     <!-- Tax Calculator UI -->
                     <div class="tool-ui-section active" id="ui-tax">
-                        <h2>Tax Calculator</h2>
-                        <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem;">Estimate your income tax liability across different regimes instantly.</p>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                            <h2>Tax Calculator</h2>
+                            <span style="background: rgba(46, 204, 113, 0.1); color: #2ecc71; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(46, 204, 113, 0.3);">FY 2026-27</span>
+                        </div>
+                        <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem;">Estimate your income tax liability across different regimes as per latest budget updates.</p>
+                        
                         <div class="input-group">
-                            <label>Annual Income (₹)</label>
+                            <label>Annual Gross Salary (₹)</label>
                             <div class="range-container">
-                                <input type="range" id="incomeSlider" min="0" max="5000000" step="50000" value="1000000">
+                                <input type="range" id="incomeSlider" min="0" max="10000000" step="50000" value="2000000">
                                 <div class="slider-labels">
                                     <span>₹0</span>
-                                    <span id="incomeDisplay" style="font-weight: 700; color: var(--primary);">₹10,00,000</span>
-                                    <span>₹50L+</span>
+                                    <span id="incomeDisplay" style="font-weight: 700; color: var(--primary);">₹20,00,000</span>
+                                    <span>₹1Cr+</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Deductions -->
+                        <div id="deductionsPanel" style="margin-top: 1.5rem; background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <h4 style="font-family: 'Outfit', sans-serif; font-size: 0.9rem; margin-bottom: 1rem; color: #1e293b;">Deductions (Old Regime only)</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                <div class="input-group">
+                                    <label style="font-size: 0.75rem;">Section 80C (LIC, PPF...)</label>
+                                    <input type="number" id="input80C" value="0" step="5000" max="150000" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px;">
+                                </div>
+                                <div class="input-group">
+                                    <label style="font-size: 0.75rem;">HRA/Home Loan Interest</label>
+                                    <input type="number" id="inputDeductionOther" value="0" step="5000" style="width: 100%; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px;">
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="regime-toggle">
+                        <div class="regime-toggle" style="margin-top: 1.5rem;">
                             <button class="toggle-btn active" data-regime="new">New Regime</button>
                             <button class="toggle-btn" data-regime="old">Old Regime</button>
                         </div>
 
-                        <div class="tax-result-card" style="background: rgba(46, 204, 113, 0.08); border: 1px solid rgba(46, 204, 113, 0.2); padding: 2rem; border-radius: 12px; text-align: center; margin-top: 2rem;">
-                            <span class="result-label" style="display: block; color: var(--text-muted); margin-bottom: 0.5rem;">Estimated Tax</span>
-                            <div class="result-value" id="taxResultValue" style="font-size: 2.5rem; font-weight: 700; color: var(--primary);">₹50,000</div>
+                        <div class="tax-result-card" style="background: white; border: 1px solid #e2e8f0; padding: 1.5rem; border-radius: 12px; margin-top: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed #e2e8f0;">
+                                <span style="color: #64748b; font-size: 0.9rem;">Estimated Tax Liability</span>
+                                <strong id="taxResultValue" style="font-size: 1.75rem; color: var(--primary);">₹1,92,400</strong>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; text-align: center;">
+                                <div style="padding: 0.5rem;">
+                                    <span style="display: block; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Base Tax</span>
+                                    <span id="resBaseTax" style="font-weight: 600; font-size: 0.95rem; color: #1e293b;">₹1,85,000</span>
+                                </div>
+                                <div style="padding: 0.5rem;">
+                                    <span style="display: block; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Surcharge</span>
+                                    <span id="resSurcharge" style="font-weight: 600; font-size: 0.95rem; color: #1e293b;">₹0</span>
+                                </div>
+                                <div style="padding: 0.5rem;">
+                                    <span style="display: block; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">Cess (4%)</span>
+                                    <span id="resCess" style="font-weight: 600; font-size: 0.95rem; color: #1e293b;">₹7,400</span>
+                                </div>
+                            </div>
+
+                            <div id="savingsPanel" style="margin-top: 1.5rem; background: #ecfdf5; border: 1px solid #10b981; padding: 0.75rem; border-radius: 8px; text-align: center;">
+                                <span style="color: #065f46; font-size: 0.85rem; font-weight: 500;">
+                                    <i data-lucide="sparkles" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>
+                                    You save <strong id="savingsAmount">₹2,21,000</strong> compared to Old Regime!
+                                </span>
+                            </div>
                         </div>
                     </div>
 

@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Sticky Header ---
     const isHomePage = document.querySelector('.hero') !== null;
-    
+
     if (!isHomePage && header) {
         header.classList.add('scrolled');
     }
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', () => {
         if (!header) return;
         if (!isHomePage) return; // Keep it solidly styled on inner pages
-        
+
         if (window.scrollY > 20) {
             header.classList.add('scrolled');
         } else {
@@ -75,56 +75,141 @@ document.addEventListener('DOMContentLoaded', () => {
     const incomeDisplay = document.getElementById('incomeDisplay');
     const taxValueDisplay = document.getElementById('taxResultValue');
     const regimeBtns = document.querySelectorAll('.toggle-btn');
-    
-    let currentRegime = 'new';
+    const input80C = document.getElementById('input80C');
+    const inputDeductionOther = document.getElementById('inputDeductionOther');
+    const resBaseTax = document.getElementById('resBaseTax');
+    const resSurcharge = document.getElementById('resSurcharge');
+    const resCess = document.getElementById('resCess');
+    const savingsAmount = document.getElementById('savingsAmount');
+    const savingsPanel = document.getElementById('savingsPanel');
 
-    const calculateTax = () => {
-        const income = parseInt(incomeSlider.value);
-        incomeDisplay.textContent = `₹${income.toLocaleString('en-IN')}`;
-        
-        const regime = document.querySelector('.regime-toggle .active').dataset.regime;
+    const calculateTaxForRegime = (income, regime, ded80c = 0, dedOther = 0) => {
         let tax = 0;
-        
+        let baseTax = 0;
+        let surcharge = 0;
+
         if (regime === 'new') {
-            const taxable = Math.max(0, income - 75000); // ₹75k Standard Deduction
-            if (taxable <= 1200000) { // §87A rebate makes taxable income up to ₹12L tax-free
+            const taxable = Math.max(0, income - 75000); // Standard Deduction
+            if (taxable > 400000) {
+                if (taxable <= 800000) baseTax = (taxable - 400000) * 0.05;
+                else if (taxable <= 1200000) baseTax = 20000 + (taxable - 800000) * 0.10;
+                else if (taxable <= 1600000) baseTax = 60000 + (taxable - 1200000) * 0.15;
+                else if (taxable <= 2000000) baseTax = 120000 + (taxable - 1600000) * 0.20;
+                else if (taxable <= 2400000) baseTax = 200000 + (taxable - 2000000) * 0.25;
+                else baseTax = 300000 + (taxable - 2400000) * 0.30;
+            }
+
+            // Rebate 87A with Marginal Relief
+            if (taxable <= 1200000) {
                 tax = 0;
             } else {
-                if (taxable <= 1600000) tax = 60000 + (taxable - 1200000) * 0.15;
-                else if (taxable <= 2000000) tax = 120000 + (taxable - 1600000) * 0.20;
-                else if (taxable <= 2400000) tax = 200000 + (taxable - 2000000) * 0.25;
-                else tax = 300000 + (taxable - 2400000) * 0.30;
+                const excessLimit = income - 1275000;
+                tax = (baseTax > excessLimit && excessLimit > 0) ? excessLimit : baseTax;
             }
         } else {
-            // Old Regime (assumes ₹50k Std Deduction & max ₹1.5L 80C)
-            const taxable = Math.max(0, income - 200000);
-            if (taxable <= 500000) { // §87A rebate
+            // Old Regime
+            const taxable = Math.max(0, income - 50000 - ded80c - dedOther);
+            if (taxable > 250000) {
+                if (taxable <= 500000) baseTax = (taxable - 250000) * 0.05;
+                else if (taxable <= 1000000) baseTax = 12500 + (taxable - 500000) * 0.20;
+                else baseTax = 112500 + (taxable - 1000000) * 0.30;
+            }
+
+            // Rebate 87A with Marginal Relief
+            if (taxable <= 500000) {
                 tax = 0;
             } else {
-                if (taxable <= 1000000) tax = 12500 + (taxable - 500000) * 0.20;
-                else tax = 112500 + (taxable - 1000000) * 0.30;
+                const threshold = 550000 + ded80c + dedOther;
+                const excessLimit = income - threshold;
+                tax = (baseTax > excessLimit && excessLimit > 0) ? excessLimit : baseTax;
             }
         }
 
-        // Add 4% Health and Education Cess to computed tax
-        tax = tax * 1.04;
+        // Surcharge Logic
+        if (income > 20000000) { // > 2Cr
+            surcharge = tax * 0.25;
+            // Marginal relief on 2Cr surcharge
+            const taxAt2Cr = calculateTaxForRegime(20000000, regime, ded80c, dedOther).rawBase;
+            const surchargeAt2Cr = taxAt2Cr * 0.15;
+            const diffIncome = income - 20000000;
+            const diffTax = (tax + surcharge) - (taxAt2Cr + surchargeAt2Cr);
+            if (diffTax > diffIncome) surcharge = (taxAt2Cr + surchargeAt2Cr + diffIncome) - tax;
+        } else if (income > 10000000) { // > 1Cr
+            surcharge = tax * 0.15;
+            const taxAt1Cr = calculateTaxForRegime(10000000, regime, ded80c, dedOther).rawBase;
+            const surchargeAt1Cr = taxAt1Cr * 0.10;
+            const diffIncome = income - 10000000;
+            const diffTax = (tax + surcharge) - (taxAt1Cr + surchargeAt1Cr);
+            if (diffTax > diffIncome) surcharge = (taxAt1Cr + surchargeAt1Cr + diffIncome) - tax;
+        } else if (income > 5000000) { // > 50L
+            surcharge = tax * 0.10;
+            const taxAt50L = calculateTaxForRegime(5000000, regime, ded80c, dedOther).rawBase;
+            const diffIncome = income - 5000000;
+            const diffTax = (tax + surcharge) - taxAt50L;
+            if (diffTax > diffIncome) surcharge = (taxAt50L + diffIncome) - tax;
+        }
 
-        taxValueDisplay.textContent = `₹${Math.round(tax).toLocaleString('en-IN')}`;
+        const cess = (tax + surcharge) * 0.04;
+        return { 
+            total: Math.round(tax + surcharge + cess), 
+            rawBase: tax, 
+            rawSurcharge: surcharge, 
+            rawCess: cess 
+        };
+    };
+
+    const calculateTax = () => {
+        if (!incomeSlider) return;
+        const income = parseInt(incomeSlider.value);
+        const ded80c = Math.min(150000, parseInt(input80C.value) || 0);
+        const dedOther = parseInt(inputDeductionOther.value) || 0;
+
+        incomeDisplay.textContent = `₹${income.toLocaleString('en-IN')}`;
+        
+        const currentRegime = document.querySelector('.regime-toggle .active').dataset.regime;
+        const newRes = calculateTaxForRegime(income, 'new');
+        const oldRes = calculateTaxForRegime(income, 'old', ded80c, dedOther);
+
+        const activeRes = currentRegime === 'new' ? newRes : oldRes;
+
+        // UI Updates
+        taxValueDisplay.textContent = `₹${activeRes.total.toLocaleString('en-IN')}`;
+        resBaseTax.textContent = `₹${activeRes.rawBase.toLocaleString('en-IN')}`;
+        resSurcharge.textContent = `₹${Math.round(activeRes.rawSurcharge).toLocaleString('en-IN')}`;
+        resCess.textContent = `₹${Math.round(activeRes.rawCess).toLocaleString('en-IN')}`;
+
+        // Savings Comparison
+        const savings = Math.abs(newRes.total - oldRes.total);
+        const betterRegime = newRes.total < oldRes.total ? 'New Regime' : 'Old Regime';
+        
+        if (savings === 0) {
+            savingsPanel.style.display = 'none';
+        } else {
+            savingsPanel.style.display = 'block';
+            savingsPanel.style.background = betterRegime === 'New Regime' ? '#ecfdf5' : '#eff6ff';
+            savingsPanel.style.borderColor = betterRegime === 'New Regime' ? '#10b981' : '#3b82f6';
+            savingsPanel.querySelector('span').style.color = betterRegime === 'New Regime' ? '#065f46' : '#1e40af';
+            savingsPanel.querySelector('span').innerHTML = `
+                <i data-lucide="sparkles" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>
+                You save <strong>₹${savings.toLocaleString('en-IN')}</strong> with the ${betterRegime}!
+            `;
+            lucide.createIcons();
+        }
     };
 
     if (incomeSlider) {
         incomeSlider.addEventListener('input', calculateTax);
+        input80C.addEventListener('input', calculateTax);
+        inputDeductionOther.addEventListener('input', calculateTax);
         
         regimeBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 regimeBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                currentRegime = btn.getAttribute('data-regime');
                 calculateTax();
             });
         });
 
-        // Initialize display
         calculateTax();
     }
 
@@ -141,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const calculateEMI = () => {
         if (!emiLoanAmount) return;
-        
+
         const p = parseFloat(emiLoanAmount.value);
         const r = (parseFloat(emiInterestRate.value) / 12) / 100;
         const n = parseFloat(emiTenure.value) * 12;
@@ -156,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             emi = p / n;
         }
-        
+
         const totalPayment = emi * n;
         const totalInterest = totalPayment - p;
 
@@ -186,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const calculateHealth = () => {
         if (!healthSavings) return;
-        
+
         const s = parseInt(healthSavings.value);
         const d = parseInt(healthDebt.value);
         const i = parseInt(healthInsurance.value);
@@ -201,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         score = Math.min(100, Math.max(0, Math.round(score)));
 
         healthScoreDisplay.textContent = `${score}/100`;
-        
+
         let label = 'Needs Improvement';
         let color = '#ef4444'; // red
         if (score > 80) { label = 'Excellent'; color = '#2ecc71'; }
@@ -233,13 +318,13 @@ document.addEventListener('DOMContentLoaded', () => {
         item.addEventListener('click', () => {
             toolItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
-            
+
             const toolTitle = item.querySelector('h3').textContent;
-            
+
             Object.values(toolUIs).forEach(ui => {
-                if(ui) ui.style.display = 'none';
+                if (ui) ui.style.display = 'none';
             });
-            
+
             if (toolUIs[toolTitle]) {
                 toolUIs[toolTitle].style.display = 'block';
             }
@@ -285,12 +370,12 @@ document.addEventListener('DOMContentLoaded', () => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
-            
+
             if (targetId === '#') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
             }
-            
+
             // Allow login to bypass scroll if it's not a real anchor
             if (this.id === 'loginBtn' || this.classList.contains('nav-login')) return;
 
@@ -302,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         behavior: 'smooth'
                     });
                 }
-            } catch(e) {}
+            } catch (e) { }
         });
     });
 
@@ -310,10 +395,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (contactForm) {
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
+
             const btn = contactForm.querySelector('button[type="submit"]');
             const originalText = btn.innerHTML;
-            
+
             btn.innerHTML = 'Sending...';
             btn.disabled = true;
 
@@ -325,8 +410,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 message: document.getElementById('message').value
             };
 
-            const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-                ? 'http://localhost:5005/api' 
+            const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? 'http://localhost:5005/api'
                 : 'https://finpulse-backend-v2.onrender.com/api';
 
             fetch(`${API_BASE}/contact`, {
@@ -334,25 +419,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
             })
-            .then(async response => {
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message || 'Error occurred');
-                return data;
-            })
-            .then(() => {
-                formStatus.style.color = 'var(--primary)';
-                formStatus.textContent = 'Message sent! We will contact you soon.';
-                contactForm.reset();
-                setTimeout(() => formStatus.textContent = '', 5000);
-            })
-            .catch(err => {
-                formStatus.style.color = '#ff4444';
-                formStatus.textContent = err.message || 'Failed to send message.';
-            })
-            .finally(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            });
+                .then(async response => {
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || 'Error occurred');
+                    return data;
+                })
+                .then(() => {
+                    formStatus.style.color = 'var(--primary)';
+                    formStatus.textContent = 'Message sent! We will contact you soon.';
+                    contactForm.reset();
+                    setTimeout(() => formStatus.textContent = '', 5000);
+                })
+                .catch(err => {
+                    formStatus.style.color = '#ff4444';
+                    formStatus.textContent = err.message || 'Failed to send message.';
+                })
+                .finally(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
         });
     }
 });
