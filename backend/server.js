@@ -28,11 +28,20 @@ const allowedOrigins = [
   "http://localhost:8080"
 ];
 
+const isLocalhostOrigin = (origin) => {
+  try {
+    const parsed = new URL(origin);
+    return parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
+  } catch (error) {
+    return false;
+  }
+};
+
 app.use(cors({
   origin: function (origin, callback) {
     // allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
+    if (allowedOrigins.indexOf(origin) === -1 && !isLocalhostOrigin(origin)) {
       const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
       return callback(new Error(msg), false);
     }

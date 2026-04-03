@@ -2,9 +2,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Icons initialization
     lucide.createIcons();
 
-    const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-        ? 'http://localhost:5005/api' 
-        : 'https://finpulse-backend-v2.onrender.com/api';
+    const REMOTE_API_BASE = 'https://finpulse-backend-v2.onrender.com/api';
+    const LOCAL_API_PORTS = ['5000', '5005'];
+    const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    const probeHealth = async (origin) => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 1200);
+
+        try {
+            const response = await fetch(`${origin}/health`, { signal: controller.signal });
+            return response.ok;
+        } catch (error) {
+            return false;
+        } finally {
+            clearTimeout(timer);
+        }
+    };
+
+    const resolveApiBase = async () => {
+        if (!isLocalHost) {
+            return REMOTE_API_BASE;
+        }
+
+        for (const port of LOCAL_API_PORTS) {
+            const origin = `${window.location.protocol}//${window.location.hostname}:${port}`;
+            const healthy = await probeHealth(origin);
+            if (healthy) {
+                return `${origin}/api`;
+            }
+        }
+
+        return `${window.location.protocol}//${window.location.hostname}:5000/api`;
+    };
+
+    const apiBasePromise = resolveApiBase();
+    const apiFetch = async (path, options = {}) => {
+        const base = await apiBasePromise;
+        return fetch(`${base}${path}`, options);
+    };
     const token = localStorage.getItem('token');
     const userStr = localStorage.getItem('user');
 
@@ -28,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
-            await fetch(`${API_URL}/auth/logout`, {
+            await apiFetch('/auth/logout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: user.email, role: user.role })
@@ -103,7 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Data Loaders
     const loadStats = async () => {
         try {
-            const res = await fetch(`${API_URL}/admin/stats`, { headers });
+            const res = await apiFetch('/admin/stats', { headers });
             if (res.ok) {
                 const data = await res.json();
                 document.getElementById('statClients').textContent = data.totalClients || 0;
@@ -115,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const loadBlogs = async () => {
         try {
-            const res = await fetch(`${API_URL}/admin/blogs`, { headers });
+            const res = await apiFetch('/admin/blogs', { headers });
             const data = await res.json();
             const tbody = document.getElementById('blogsTableBody');
             tbody.innerHTML = '';
@@ -142,7 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const loadClients = async () => {
         try {
-            const res = await fetch(`${API_URL}/admin/clients`, { headers });
+            const res = await apiFetch('/admin/clients', { headers });
             const data = await res.json();
             const tbody = document.getElementById('clientsTableBody');
             tbody.innerHTML = '';
@@ -168,7 +204,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const loadActivities = async () => {
         try {
-            const res = await fetch(`${API_URL}/admin/activities`, { headers });
+            const res = await apiFetch('/admin/activities', { headers });
             const data = await res.json();
             const tbody = document.getElementById('activitiesTableBody');
             tbody.innerHTML = '';
@@ -208,7 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            const res = await fetch(`${API_URL}/admin/blogs`, {
+            const res = await apiFetch('/admin/blogs', {
                 method: 'POST',
                 headers,
                 body: JSON.stringify({ title, content, image: uploadedImageBase64 })
@@ -234,7 +270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const password = document.getElementById('clientPassword').value;
 
         try {
-            const res = await fetch(`${API_URL}/admin/clients`, {
+            const res = await apiFetch('/admin/clients', {
                 method: 'POST',
                 headers,
                 body: JSON.stringify({ name, email, password })
@@ -255,7 +291,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.deleteBlog = async (id) => {
         if(!confirm('Are you sure you want to delete this blog?')) return;
         try {
-            await fetch(`${API_URL}/admin/blogs/${id}`, { method: 'DELETE', headers });
+            await apiFetch(`/admin/blogs/${id}`, { method: 'DELETE', headers });
             loadBlogs();
         } catch(e) { console.error(e); }
     };
@@ -265,7 +301,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(!newPassword) return;
         
         try {
-            const res = await fetch(`${API_URL}/admin/clients/${id}/password`, { 
+            const res = await apiFetch(`/admin/clients/${id}/password`, { 
                 method: 'PUT', 
                 headers,
                 body: JSON.stringify({ password: newPassword })

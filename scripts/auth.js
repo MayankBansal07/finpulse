@@ -3,10 +3,45 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Dynamically set API URL based on environment
-    const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-        ? 'http://localhost:5005/api' 
-        : 'https://finpulse-backend-v2.onrender.com/api';
+    const REMOTE_API_BASE = 'https://finpulse-backend-v2.onrender.com/api';
+    const LOCAL_API_PORTS = ['5000', '5005'];
+    const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    const probeHealth = async (origin) => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 1200);
+
+        try {
+            const response = await fetch(`${origin}/health`, { signal: controller.signal });
+            return response.ok;
+        } catch (error) {
+            return false;
+        } finally {
+            clearTimeout(timer);
+        }
+    };
+
+    const resolveApiBase = async () => {
+        if (!isLocalHost) {
+            return REMOTE_API_BASE;
+        }
+
+        for (const port of LOCAL_API_PORTS) {
+            const origin = `${window.location.protocol}//${window.location.hostname}:${port}`;
+            const healthy = await probeHealth(origin);
+            if (healthy) {
+                return `${origin}/api`;
+            }
+        }
+
+        return `${window.location.protocol}//${window.location.hostname}:5000/api`;
+    };
+
+    const apiBasePromise = resolveApiBase();
+    const apiFetch = async (path, options = {}) => {
+        const base = await apiBasePromise;
+        return fetch(`${base}${path}`, options);
+    };
 
     // UI Elements
     const loginBtn = document.getElementById('loginBtn');
@@ -136,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
 
             try {
-                const response = await fetch(`${API_URL}/auth/login`, {
+                const response = await apiFetch('/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: emailInputVal, password: currentPasswordInput, role: selectedRole })
