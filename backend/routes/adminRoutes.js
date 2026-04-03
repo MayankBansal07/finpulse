@@ -103,10 +103,11 @@ router.put('/clients/:id/password', protect, admin, async (req, res) => {
 // @route   GET /api/admin/blogs
 router.get('/blogs', async (req, res) => {
   try {
-    const blogs = await Blog.find({}).sort({ createdAt: -1 });
+    const blogs = await Blog.find({}).sort({ createdAt: -1 }).allowDiskUse(true);
     res.json(blogs);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching blogs:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
