@@ -82,22 +82,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const income = parseInt(incomeSlider.value);
         incomeDisplay.textContent = `₹${income.toLocaleString('en-IN')}`;
         
+        const regime = document.querySelector('.regime-toggle .active').dataset.regime;
         let tax = 0;
-        if (currentRegime === 'new') {
-            // Simplified FY 2024-25 New Regime
-            if (income <= 700000) tax = 0;
-            else if (income <= 900000) tax = (income - 300000) * 0.05 + 15000;
-            else if (income <= 1200000) tax = (income - 900000) * 0.10 + 45000;
-            else if (income <= 1500000) tax = (income - 1200000) * 0.15 + 90000;
-            else tax = (income - 1500000) * 0.20 + 150000;
+        
+        if (regime === 'new') {
+            const taxable = Math.max(0, income - 75000); // ₹75k Standard Deduction
+            if (taxable <= 1200000) { // §87A rebate makes taxable income up to ₹12L tax-free
+                tax = 0;
+            } else {
+                if (taxable <= 1600000) tax = 60000 + (taxable - 1200000) * 0.15;
+                else if (taxable <= 2000000) tax = 120000 + (taxable - 1600000) * 0.20;
+                else if (taxable <= 2400000) tax = 200000 + (taxable - 2000000) * 0.25;
+                else tax = 300000 + (taxable - 2400000) * 0.30;
+            }
         } else {
-            // Simplified Old Regime (Assuming 1.5L 80C deduction)
-            const taxable = Math.max(0, income - 150000);
-            if (taxable <= 250000) tax = 0;
-            else if (taxable <= 500000) tax = (taxable - 250000) * 0.05;
-            else if (taxable <= 1000000) tax = (taxable - 500000) * 0.20 + 12500;
-            else tax = (taxable - 1000000) * 0.30 + 112500;
+            // Old Regime (assumes ₹50k Std Deduction & max ₹1.5L 80C)
+            const taxable = Math.max(0, income - 200000);
+            if (taxable <= 500000) { // §87A rebate
+                tax = 0;
+            } else {
+                if (taxable <= 1000000) tax = 12500 + (taxable - 500000) * 0.20;
+                else tax = 112500 + (taxable - 1000000) * 0.30;
+            }
         }
+
+        // Add 4% Health and Education Cess to computed tax
+        tax = tax * 1.04;
 
         taxValueDisplay.textContent = `₹${Math.round(tax).toLocaleString('en-IN')}`;
     };
