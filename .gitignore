@@ -1,1 +1,6 @@
-.vercel
+node_modules/
+npm-cache/
+backend/npm-cache/
+
+.env
+.DS_Store
