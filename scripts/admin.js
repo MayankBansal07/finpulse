@@ -119,6 +119,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     document.getElementById('btnGenerateClient').addEventListener('click', () => toggleDisplay('newClientPanel', true));
     document.getElementById('btnCancelClient').addEventListener('click', () => toggleDisplay('newClientPanel', false));
+    
+    document.getElementById('btnCancelSupport').addEventListener('click', () => toggleDisplay('supportPanel', false));
 
     // Blog Image Upload Preview
     let uploadedImageBase64 = null;
@@ -190,11 +192,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             data.forEach(client => {
                 const tr = document.createElement('tr');
+                const support = client.assignedSupport ? `${client.assignedSupport.name}` : '<span style="color:#94a3b8; font-style:italic;">None Assigned</span>';
+                
                 tr.innerHTML = `
                     <td style="font-weight: 500;">${client.name}</td>
                     <td style="color: #4f46e5; font-weight: 600;">${client.clientId || 'FNC-XXXX'}</td>
-                    <td>${client.email}</td>
-                    <td><span class="pill" style="color:#22c55e; border:1px solid #22c55e; cursor:pointer;" onclick="editClientPass('${client._id}')">Edit Pass</span></td>
+                    <td>${support}</td>
+                    <td>
+                        <div style="display:flex; gap:0.5rem;">
+                            <button class="pill" style="color:#22c55e; border:1px solid #22c55e; background:none; cursor:pointer;" onclick="openSupportModal('${client._id}', '${client.assignedSupport?.name || ''}', '${client.assignedSupport?.phone || ''}', '${client.assignedSupport?.email || ''}')">Support</button>
+                            <button class="pill" style="color:#64748b; border:1px solid #e2e8f0; background:none; cursor:pointer;" onclick="editClientPass('${client._id}')">Pass</button>
+                        </div>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -287,7 +296,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch(e) { alert(`Error: ${e.message}`); }
     });
 
+    document.getElementById('assignSupportForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('supportClientId').value;
+        const name = document.getElementById('supportName').value;
+        const phone = document.getElementById('supportPhone').value;
+        const email = document.getElementById('supportEmail').value;
+
+        try {
+            const res = await apiFetch(`/admin/clients/${id}/support`, {
+                method: 'PUT',
+                headers,
+                body: JSON.stringify({ name, phone, email })
+            });
+
+            const contentType = res.headers.get("content-type");
+            if (res.ok) {
+                document.getElementById('assignSupportForm').reset();
+                toggleDisplay('supportPanel', false);
+                loadClients();
+                alert('Support assigned successfully!');
+            } else if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await res.json();
+                alert(`Error: ${data.message}`);
+            } else {
+                const text = await res.text();
+                console.error("Server returned non-JSON error:", text);
+                alert('Failed to update support. If you just applied changes, please restart the backend server (node server.js).');
+            }
+        } catch(e) { 
+            console.error(e);
+            alert(`Network Error: ${e.message}`); 
+        }
+    });
+
     // Global Action functions
+    window.openSupportModal = (id, name, phone, email) => {
+        document.getElementById('supportClientId').value = id;
+        document.getElementById('supportName').value = name || '';
+        document.getElementById('supportPhone').value = phone || '';
+        document.getElementById('supportEmail').value = email || '';
+        toggleDisplay('supportPanel', true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     window.deleteBlog = async (id) => {
         if(!confirm('Are you sure you want to delete this blog?')) return;
         try {

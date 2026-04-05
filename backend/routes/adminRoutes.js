@@ -100,6 +100,29 @@ router.put('/clients/:id/password', protect, admin, async (req, res) => {
   }
 });
 
+// @route   PUT /api/admin/clients/:id/support
+// @desc    Assign Support person to client
+// @access  Private/Admin
+router.put('/clients/:id/support', protect, admin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      user.assignedSupport = {
+        name: req.body.name,
+        phone: req.body.phone,
+        email: req.body.email
+      };
+      await user.save();
+      await Activity.create({ userEmail: req.user.email, role: 'admin', action: `Assigned Support to ${user.name}` });
+      res.json({ message: 'Support assigned successfully', assignedSupport: user.assignedSupport });
+    } else {
+      res.status(404).json({ message: 'Client not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // @route   GET /api/admin/blogs
 router.get('/blogs', async (req, res) => {
   try {

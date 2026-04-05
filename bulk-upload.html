@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Data Management | FinPulse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://unpkg.com/lucide@latest/dist/umd/lucide.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #f8fafc;
+            --bg-card: #ffffff;
+            --border-glass: #e2e8f0;
+            --primary: #22c55e;
+            --primary-hover: #16a34a;
+            --text-light: #0f172a;
+            --text-muted: #64748b;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-glass);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: transparent;
+            border: 1px solid var(--border-glass);
+            color: var(--text-light);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .header-title {
+            margin: 0 0 0 2rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .main-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Tabs styling */
+        .tabs-header {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 0 0 1rem 0;
+            font-size: 1.125rem;
+            font-weight: 500;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .top-section {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .upload-zone {
+            flex: 2;
+            background: var(--bg-card);
+            border: 2px dashed var(--primary);
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover {
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .upload-icon {
+            color: var(--primary);
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            font-size: 1.125rem;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-green {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-green:hover {
+            background: var(--primary-hover);
+        }
+
+        .template-card {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 1rem;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .template-card h3 {
+            margin: 0 0 1.5rem 0;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid var(--border-glass);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: var(--text-light);
+        }
+
+        .data-grid {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(0, 0, 0, 0.02);
+            padding: 1rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-glass);
+            font-size: 0.875rem;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-glass);
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        tr:hover td {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-valid {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Action Buttons */
+        .row-action-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.35rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .row-action-btn:hover {
+            color: var(--primary);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .row-action-btn.delete:hover {
+            color: var(--error);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <a href="client-dashboard.html" class="back-btn">
+            <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i> Back to Dashboard
+        </a>
+        <h1 class="header-title">GST Data Management</h1>
+    </header>
+
+    <main class="main-container">
+        <!-- Tabs -->
+        <div class="tabs-header">
+            <button class="tab-btn active" onclick="switchTab('sales')">Sales Bulk Upload (GSTR-1)</button>
+            <button class="tab-btn" onclick="switchTab('purchases')">Purchases Bulk Upload (GSTR-2B)</button>
+            <button class="tab-btn" onclick="switchTab('expenses')">Expenses Upload</button>
+        </div>
+
+        <!-- Sales Tab Content -->
+        <div id="sales" class="tab-content active">
+            <div class="top-section">
+                <!-- Upload Dropzone -->
+                <div class="upload-zone" onclick="document.getElementById('fileInputSales').click()">
+                    <i data-lucide="upload-cloud" class="upload-icon"></i>
+                    <div class="upload-text">Drag & Drop</div>
+                    <div style="color: var(--text-muted); margin-bottom: 1.5rem;">Drop your Sales .CSV or .XLSX file
+                        here</div>
+                    <button class="btn-green">Select File from Device</button>
+                    <input type="file" id="fileInputSales" style="display: none;" accept=".csv, .xlsx, .xlsm">
+                </div>
+
+                <!-- Download Template Card -->
+                <div class="template-card">
+                    <h3>GSTR-1 Sales Template</h3>
+                    <a href="GST_Validate_sheet.xlsm" download class="btn-outline"
+                        style="text-decoration: none; display: inline-block;">Download Blank Template</a>
+                </div>
+            </div>
+
+            <!-- Data Preview Grid Sales -->
+            <div class="data-grid">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Date</th>
+                            <th>GSTIN of Receiver</th>
+                            <th>Place of Supply</th>
+                            <th>Taxable Value</th>
+                            <th>IGST</th>
+                            <th>CGST</th>
+                            <th>SGST</th>
+                            <th>Invoice Value</th>
+                            <th>Validation Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamic Records will be restored from backend or uploaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bottom Action Buttons -->
+            <div class="action-footer">
+                <button class="btn-outline">Reset Sales</button>
+                <button class="btn-green" onclick="importData()">Validate and Import Sales Data</button>
+            </div>
+        </div>
+
+
+        <!-- Purchases Tab Content -->
+        <div id="purchases" class="tab-content">
+            <div class="top-section">
+                <!-- Upload Dropzone -->
+                <div class="upload-zone" onclick="document.getElementById('fileInputPurchase').click()">
+                    <i data-lucide="upload-cloud" class="upload-icon"></i>
+                    <div class="upload-text">Drag & Drop</div>
+                    <div style="color: var(--text-muted); margin-bottom: 1.5rem;">Drop your Purchase .CSV or .XLSX file
+                        here</div>
+                    <button class="btn-green">Select File from Device</button>
+                    <input type="file" id="fileInputPurchase" style="display: none;" accept=".csv, .xlsx, .xlsm">
+                </div>
+
+                <!-- Download Template Card -->
+                <div class="template-card">
+                    <h3>GSTR-2B Excel Template</h3>
+                    <a href="GST_Validate_sheet.xlsm" download class="btn-outline"
+                        style="text-decoration: none; display: inline-block;">Download Blank Template</a>
+                </div>
+            </div>
+
+            <!-- Data Preview Grid Purchases -->
+            <div class="data-grid">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Date</th>
+                            <th>GSTIN of Supplier</th>
+                            <th>Place of Supply</th>
+                            <th>Total Value</th>
+                            <th>Tax Amount</th>
+                            <th>Input Tax Credit (ITC)</th>
+                            <th>Validation Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamic Records will be restored from backend or uploaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bottom Action Buttons -->
+            <div class="action-footer">
+                <button class="btn-outline">Reset Purchases</button>
+                <button class="btn-green" onclick="importData()">Validate and Import Purchase Data</button>
+            </div>
+        </div>
+
+        <!-- Expenses Tab Content -->
+        <div id="expenses" class="tab-content">
+            <div class="top-section">
+                <!-- Upload Dropzone -->
+                <div class="upload-zone" onclick="document.getElementById('fileInputExpense').click()">
+                    <i data-lucide="upload-cloud" class="upload-icon"></i>
+                    <div class="upload-text">Drag & Drop</div>
+                    <div style="color: var(--text-muted); margin-bottom: 1.5rem;">Drop your Expenses .CSV or .XLSX file
+                        here</div>
+                    <button class="btn-green">Select File from Device</button>
+                    <input type="file" id="fileInputExpense" style="display: none;" accept=".csv, .xlsx, .xlsm">
+                </div>
+
+                <!-- Download Template Card -->
+                <div class="template-card">
+                    <h3>Expenses Excel Template</h3>
+                    <a href="GST_Validate_sheet.xlsm" download class="btn-outline"
+                        style="text-decoration: none; display: inline-block;">Download Blank Template</a>
+                </div>
+            </div>
+
+            <!-- Data Preview Grid Expenses -->
+            <div class="data-grid">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Receipt #</th>
+                            <th>Date</th>
+                            <th>Vendor Name</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Tax Paid</th>
+                            <th>Validation Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamic Records will be restored from backend or uploaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bottom Action Buttons -->
+            <div class="action-footer">
+                <button class="btn-outline">Reset Expenses</button>
+                <button class="btn-green" onclick="importData()">Validate and Import Expenses Data</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script>
+        const REMOTE_API_BASE = 'https://finpulse-backend-v2.onrender.com/api';
+        const LOCAL_API_PORTS = ['5000', '5005'];
+        const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+        const probeHealth = async (origin) => {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 1200);
+            try {
+                const response = await fetch(`${origin}/health`, { signal: controller.signal });
+                return response.ok;
+            } catch (error) {
+                return false;
+            } finally {
+                clearTimeout(timer);
+            }
+        };
+
+        const resolveApiBase = async () => {
+            if (!isLocalHost) return REMOTE_API_BASE;
+            for (const port of LOCAL_API_PORTS) {
+                const origin = `${window.location.protocol}//${window.location.hostname}:${port}`;
+                const healthy = await probeHealth(origin);
+                if (healthy) return `${origin}/api`;
+            }
+            return `${window.location.protocol}//${window.location.hostname}:5000/api`;
+        };
+
+        lucide.createIcons();
+
+        // Handle Excel Parsing
+        function handleFileUpload(e, tabId) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+
+                // Read as array of arrays, but formatted strings so dates look normal
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false, dateNF: 'dd/mm/yyyy' });
+
+                // Find the real header row by scanning for typical column names
+                let headerRowIdx = -1;
+                for (let i = 0; i < jsonData.length; i++) {
+                    let row = jsonData[i];
+                    if (!row || row.length === 0) continue;
+                    let strRow = row.map(c => typeof c === 'string' ? c.toLowerCase().replace(/[^a-z]/g, '') : '');
+
+                    // If row has 'date' and ('gstin' OR 'invoice' OR 'receipt' OR 'vendor') it's likely the true header row
+                    let hasDate = strRow.some(s => s.includes('date'));
+                    let hasIdentity = strRow.some(s => s.includes('gstin') || s.includes('invoice') || s.includes('receipt') || s.includes('vendor'));
+
+                    if (hasDate && hasIdentity) {
+                        headerRowIdx = i;
+                        break;
+                    }
+                }
+
+                if (headerRowIdx === -1) {
+                    alert("Could not detect valid headers in the uploaded file. Ensure column names like 'Date' and 'Invoice' exist.");
+                    return;
+                }
+
+                // Clean header array for searching
+                const headers = jsonData[headerRowIdx].map(h => typeof h === 'string' ? h.toLowerCase().replace(/[^a-z]/g, '') : "");
+
+                const tbody = document.querySelector(`#${tabId} tbody`);
+                tbody.innerHTML = '';
+
+                // Helper to search indices flexibly
+                function getVal(row, keywords) {
+                    for (let kw of keywords) {
+                        let idx = headers.findIndex(h => h.includes(kw));
+                        if (idx !== -1 && row[idx] !== undefined && row[idx] !== null && row[idx] !== "") {
+                            return row[idx];
+                        }
+                    }
+                    return '0.00';
+                }
+
+                // Process everything AFTER the header row
+                for (let i = headerRowIdx + 1; i < jsonData.length; i++) {
+                    let row = jsonData[i];
+                    // Skip entirely empty rows
+                    if (!row || row.length === 0 || row.every(c => c === undefined || c === null || c === "")) continue;
+
+                    let tr = document.createElement('tr');
+                    let html = '';
+
+                    let cols = [];
+                    if (tabId === 'sales') {
+                        cols = [
+                            getVal(row, ['invoiceno', 'invoice', 'bill']),
+                            getVal(row, ['date']),
+                            getVal(row, ['gstin', 'receiver']),
+                            getVal(row, ['placeofsupply', 'state', 'location']),
+                            getVal(row, ['taxablevalue', 'taxableamount']),
+                            getVal(row, ['igst', 'integratedtax']),
+                            getVal(row, ['cgst', 'centraltax']),
+                            getVal(row, ['sgst', 'statetax', 'utgst']),
+                            getVal(row, ['invoicevalue', 'totalvalue', 'totalamount'])
+                        ];
+                    } else if (tabId === 'purchases') {
+                        cols = [
+                            getVal(row, ['invoiceno', 'invoice', 'bill']),
+                            getVal(row, ['date']),
+                            getVal(row, ['gstin', 'vendor']),
+                            getVal(row, ['placeofsupply', 'state', 'location']),
+                            getVal(row, ['totalvalue', 'invoicevalue', 'totalamount']),
+                            getVal(row, ['taxamount', 'totalgst', 'taxablevalue_non_match']),
+                            getVal(row, ['itc', 'inputtaxcredit', 'credit'])
+                        ];
+                    } else if (tabId === 'expenses') {
+                        cols = [
+                            getVal(row, ['receipt', 'invoice', 'bill', 'id']),
+                            getVal(row, ['date']),
+                            getVal(row, ['vendor', 'name', 'merchant']),
+                            getVal(row, ['category', 'type']),
+                            getVal(row, ['amount', 'total', 'grandtotal']),
+                            getVal(row, ['taxpaid', 'gstamount', 'gstpaid'])
+                        ];
+                    }
+
+                    for (let cellData of cols) {
+                        // If cellData is completely blank or missing, fallback to 0.00
+                        html += `<td>${cellData || '0.00'}</td>`;
+                    }
+
+                    html += `<td><span class="status-tag status-valid"><i data-lucide="check-circle-2" style="width: 14px; height: 14px;"></i> Uploaded</span></td>`;
+                    html += `<td>
+                        <div class="actions-cell">
+                            <button class="row-action-btn" title="Edit"><i data-lucide="pencil" style="width: 14px; height: 14px;"></i></button>
+                            <button class="row-action-btn delete" title="Delete"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></button>
+                        </div>
+                    </td>`;
+
+                    tr.innerHTML = html;
+                    tbody.appendChild(tr);
+                }
+
+                lucide.createIcons();
+                e.target.value = ''; // Reset input to allow re-upload
+                alert('File ' + file.name + ' uploaded successfully! Please review the grid and then press Validate.');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        document.getElementById('fileInputSales').addEventListener('change', (e) => handleFileUpload(e, 'sales'));
+        document.getElementById('fileInputPurchase').addEventListener('change', (e) => handleFileUpload(e, 'purchases'));
+        document.getElementById('fileInputExpense').addEventListener('change', (e) => handleFileUpload(e, 'expenses'));
+
+        function extractNumber(str) {
+            if (!str) return 0;
+            return parseFloat(str.replace(/[₹,]/g, '')) || 0;
+        }
+
+        function importData() {
+            // Calculate Sales
+            let salesSum = 0;
+            let salesTax = 0;
+            let salesDateData = []; // NEW: Array of { date, value }
+
+            document.querySelectorAll('#sales tbody tr').forEach(tr => {
+                let inputs = tr.querySelectorAll('input.edit-input');
+                let isEditing = tr.classList.contains("editing");
+                if (tr.cells.length > 5) {
+                    let dateVal = isEditing ? inputs[1].value : tr.cells[1].textContent;
+                    let tdValue = isEditing ? inputs[4].value : tr.cells[4].textContent;
+                    
+                    let val = extractNumber(tdValue);
+                    salesSum += val;
+                    
+                    // Push to date data for chart
+                    if (dateVal && val > 0) {
+                        salesDateData.push({ date: dateVal, value: val });
+                    }
+
+                    let igst = isEditing ? inputs[5].value : tr.cells[5].textContent;
+                    let cgst = isEditing ? inputs[6].value : tr.cells[6].textContent;
+                    let sgst = isEditing ? inputs[7].value : tr.cells[7].textContent;
+                    salesTax += extractNumber(igst) + extractNumber(cgst) + extractNumber(sgst);
+                }
+            });
+
+            // Sort sales date data by date
+            salesDateData.sort((a, b) => {
+                const dateA = a.date.split('/').reverse().join('-'); // simple DD/MM/YYYY to YYYY-MM-DD
+                const dateB = b.date.split('/').reverse().join('-');
+                return new Date(dateA) - new Date(dateB);
+            });
+
+            // Calculate Purchases
+            let purchaseSum = 0;
+            let purchaseITC = 0;
+            document.querySelectorAll('#purchases tbody tr').forEach(tr => {
+                let inputs = tr.querySelectorAll('input.edit-input');
+                let isEditing = tr.classList.contains("editing");
+                if (tr.cells.length > 5) {
+                    let tdValue = isEditing ? inputs[4].value : tr.cells[4].textContent;
+                    purchaseSum += extractNumber(tdValue);
+                    let itc = isEditing ? inputs[6].value : tr.cells[6].textContent;
+                    purchaseITC += extractNumber(itc);
+                }
+            });
+
+            // Calculate Expenses
+            let expenseSum = 0;
+            document.querySelectorAll('#expenses tbody tr').forEach(tr => {
+                let inputs = tr.querySelectorAll('input.edit-input');
+                let isEditing = tr.classList.contains("editing");
+                if (tr.cells.length > 4) {
+                    let tdValue = isEditing ? inputs[4].value : tr.cells[4].textContent;
+                    expenseSum += extractNumber(tdValue);
+                }
+            });
+
+            const totalExpenses = purchaseSum + expenseSum;
+            const netProfit = salesSum - totalExpenses;
+            const taxLiability = (salesTax - purchaseITC) > 0 ? (salesTax - purchaseITC) : 0;
+
+            const gstData = {
+                revenue: salesSum,
+                expenses: totalExpenses,
+                profit: netProfit,
+                tax: taxLiability
+            };
+
+            const salesHTML = document.querySelector('#sales tbody').innerHTML;
+            const purchasesHTML = document.querySelector('#purchases tbody').innerHTML;
+            const expensesHTML = document.querySelector('#expenses tbody').innerHTML;
+
+            // NEW: Save to Backend for isolation
+            saveToBackend(gstData, salesDateData, salesHTML, purchasesHTML, expensesHTML);
+        }
+
+        async function saveToBackend(gstData, gstSalesData, salesHTML, purchasesHTML, expensesHTML) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert("Session expired. Please log in again.");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const apiBase = await resolveApiBase();
+                const res = await fetch(`${apiBase}/auth/profile/gst`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        gstData,
+                        gstSalesData,
+                        salesHTML,
+                        purchasesHTML,
+                        expensesHTML
+                    })
+                });
+
+                if (res.ok) {
+                    alert('Data Imported Successfully. Your Dashboard Overview has been updated!');
+                    window.location.href = 'client-dashboard.html';
+                } else {
+                    const err = await res.json();
+                    alert(`Error saving data: ${err.message}`);
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Failed to connect to server for saving. Data not isolated.");
+            }
+        }
+
+        function switchTab(tabId) {
+            // Remove active from all buttons and contents
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active to selected tab and content
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Handle Row Edit and Delete
+        document.addEventListener("click", function (e) {
+            let deleteBtn = e.target.closest('.row-action-btn.delete');
+            if (deleteBtn) {
+                if (confirm("Are you sure you want to delete this entry?")) {
+                    let row = deleteBtn.closest("tr");
+                    row.remove();
+                }
+                return;
+            }
+
+            let editBtn = e.target.closest('.row-action-btn:not(.delete)');
+            if (editBtn) {
+                let row = editBtn.closest("tr");
+                let isEditing = row.classList.contains("editing");
+
+                if (!isEditing) {
+                    // Enter edit mode
+                    row.classList.add("editing");
+
+                    // Get all tds except validation status and actions
+                    let tds = row.querySelectorAll("td:not(:nth-last-child(1)):not(:nth-last-child(2))");
+
+                    tds.forEach(td => {
+                        let currentText = td.textContent.trim();
+                        td.innerHTML = `<input type="text" class="edit-input" value="${currentText}" style="width: 100%; padding: 0.35rem; border: 1px solid var(--border-glass); border-radius: 4px; font-size: inherit; font-family: inherit; background: transparent; color: inherit;">`;
+                    });
+
+                    // Change icon to save
+                    editBtn.innerHTML = `<i data-lucide="check" style="width: 14px; height: 14px; color: var(--primary);"></i>`;
+                    lucide.createIcons();
+                } else {
+                    // Save changes
+                    row.classList.remove("editing");
+
+                    let inputs = row.querySelectorAll("input.edit-input");
+                    inputs.forEach(input => {
+                        let val = input.value;
+                        let td = input.parentElement;
+                        td.textContent = val;
+                    });
+
+                    // Change icon back to pencil
+                    editBtn.innerHTML = `<i data-lucide="pencil" style="width: 14px; height: 14px;"></i>`;
+                    lucide.createIcons();
+                }
+            }
+        });
+
+        // Restore grids from Backend on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const apiBase = await resolveApiBase();
+                const res = await fetch(`${apiBase}/auth/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const profile = await res.json();
+                    if (profile.salesHTML) document.querySelector('#sales tbody').innerHTML = profile.salesHTML;
+                    if (profile.purchasesHTML) document.querySelector('#purchases tbody').innerHTML = profile.purchasesHTML;
+                    if (profile.expensesHTML) document.querySelector('#expenses tbody').innerHTML = profile.expensesHTML;
+                }
+            } catch (e) {
+                console.error("Failed to load profile for table restoration", e);
+            }
+            lucide.createIcons();
+        });
+    </script>
+</body>
+
+</html>

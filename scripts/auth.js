@@ -203,7 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.role === 'admin') {
                     window.location.href = 'admin.html';
                 } else {
-                    alert(`Welcome back, ${data.name}! Your client profile is ready.`);
+                    // Redirect clients to their dashboard
+                    window.location.href = 'client-dashboard.html';
                 }
 
             } catch (error) {
@@ -219,11 +220,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateUIForLoggedInUser = (user) => {
         if (loginBtn) {
             // Replace Login button with User Profile / Dashboard button
-            loginBtn.textContent = user.role === 'admin' ? 'Admin Dashboard' : `Hi, ${user.name.split(' ')[0]}`;
+            loginBtn.textContent = user.role === 'admin' ? 'Admin Dashboard' : `Client Dashboard`;
             loginBtn.classList.add('btn-primary');
             loginBtn.classList.remove('btn-ghost');
             
-            // Override click to go to dashboard or logout
+            // Override click to go to dashboard
             const clone = loginBtn.cloneNode(true);
             loginBtn.parentNode.replaceChild(clone, loginBtn);
             
@@ -231,11 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (user.role === 'admin') {
                     window.location.href = 'admin.html';
                 } else {
-                    if(confirm("Do you want to logout?")) {
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('user');
-                        window.location.reload();
-                    }
+                    window.location.href = 'client-dashboard.html';
                 }
             });
         }

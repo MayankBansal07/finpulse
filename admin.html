@@ -169,6 +169,34 @@
                     </form>
                 </div>
 
+                <!-- NEW: Assign Support Panel (Hidden by default) -->
+                <div class="panel" id="supportPanel" style="display: none;">
+                    <div class="panel-header">
+                        <h2>Assign Dedicated Support</h2>
+                    </div>
+                    <form id="assignSupportForm">
+                        <input type="hidden" id="supportClientId">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Support Person Name *</label>
+                                <input type="text" id="supportName" required placeholder="Relationship Manager Name">
+                            </div>
+                            <div class="form-group">
+                                <label>Support Phone *</label>
+                                <input type="text" id="supportPhone" required placeholder="+91 99999 99999">
+                            </div>
+                            <div class="form-group">
+                                <label>Support Email (Optional)</label>
+                                <input type="email" id="supportEmail" placeholder="support@finpulse.com">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="submit" class="btn-sm btn-success">Update Assignment</button>
+                            <button type="button" class="btn-sm" style="background: white; border: 1px solid #e2e8f0;" id="btnCancelSupport">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
                 <!-- Clients List -->
                 <div class="panel">
                     <div class="panel-header">
@@ -179,8 +207,8 @@
                             <thead>
                                 <tr>
                                     <th>Client Name</th>
-                                    <th>Secure Client ID</th>
-                                    <th>Linked Email</th>
+                                    <th>Secure ID</th>
+                                    <th>Support Person</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>

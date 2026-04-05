@@ -7,7 +7,25 @@ const userSchema = new mongoose.Schema({
   clientId: { type: String },
   password: { type: String, required: true },
   phone: { type: String },
-  role: { type: String, enum: ['client', 'admin'], default: 'client' }
+  role: { type: String, enum: ['client', 'admin'], default: 'client' },
+  assignedSupport: {
+    name: { type: String },
+    phone: { type: String },
+    email: { type: String }
+  },
+  gstData: { 
+    revenue: { type: Number, default: 0 },
+    expenses: { type: Number, default: 0 },
+    profit: { type: Number, default: 0 },
+    tax: { type: Number, default: 0 }
+  },
+  gstSalesData: [{
+    date: { type: String },
+    value: { type: Number }
+  }],
+  salesHTML: { type: String, default: '' },
+  purchasesHTML: { type: String, default: '' },
+  expensesHTML: { type: String, default: '' }
 }, { timestamps: true });
 
 // Hash password before saving
