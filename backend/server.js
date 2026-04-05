@@ -96,36 +96,40 @@ app.post('/api/contact', async (req, res) => {
     });
 
     // 1. Admin notification
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,        // ✅ must match your Gmail login
-      to: process.env.SMTP_USER,          // ✅ admin notification goes to your Gmail
-      replyTo: email,                     // ✅ lets you reply directly to the customer
-      subject: "New Contact Form",
-      text: `New request from ${name} (${email}): ${message}`, // plain text fallback
-      html: `
-    <h3>New Contact Request</h3>
-    <p><b>Name:</b> ${name}</p>
-    <p><b>Email:</b> ${email}</p>
-    <p><b>Message:</b> ${message}</p>
-  `
-    });
+    try {
+      await transporter.sendMail({
+        from: process.env.SMTP_USER,        // ✅ must match your Gmail login
+        to: process.env.SMTP_USER,          // ✅ admin notification goes to your Gmail
+        replyTo: email,                     // ✅ lets you reply directly to the customer
+        subject: "New Contact Form",
+        text: `New request from ${name} (${email}): ${message}`, // plain text fallback
+        html: `
+      <h3>New Contact Request</h3>
+      <p><b>Name:</b> ${name}</p>
+      <p><b>Email:</b> ${email}</p>
+      <p><b>Message:</b> ${message}</p>
+    `
+      });
 
-    const info = await transporter.sendMail({
-      from: process.env.SMTP_USER,        // ✅ must match your Gmail login
-      to: email,                          // ✅ customer’s email
-      replyTo: process.env.SMTP_USER,     // ✅ replies come back to you
-      subject: "FinPulse – Consultation Request Received",
-      text: `Hello ${name}, we received your message: "${message}". We'll contact you soon.`,
-      html: `
-    <h3>Hello ${name},</h3>
-    <p>We received your message:</p>
-    <p>"${message}"</p>
-    <br/>
-    <p>We will contact you soon.</p>
-    <p><b>FinPulse Team</b></p>
-  `
-    });
-    console.log("Customer mail sent:", info.messageId);
+      const info = await transporter.sendMail({
+        from: process.env.SMTP_USER,        // ✅ must match your Gmail login
+        to: email,                          // ✅ customer’s email
+        replyTo: process.env.SMTP_USER,     // ✅ replies come back to you
+        subject: "FinPulse – Consultation Request Received",
+        text: `Hello ${name}, we received your message: "${message}". We'll contact you soon.`,
+        html: `
+      <h3>Hello ${name},</h3>
+      <p>We received your message:</p>
+      <p>"${message}"</p>
+      <br/>
+      <p>We will contact you soon.</p>
+      <p><b>FinPulse Team</b></p>
+    `
+      });
+      console.log("Customer mail sent:", info.messageId);
+    } catch (emailError) {
+      console.error("Email notification failed to send, but data was saved:", emailError.message);
+    }
 
     res.json({ success: true });
 
