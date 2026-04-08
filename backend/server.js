@@ -14,6 +14,8 @@ const PORT = process.env.PORT || 5005;
 connectDB();
 
 const allowedOrigins = [
+  "https://finpulse.works",
+  "https://www.finpulse.works",
   "https://finpulse-v2.vercel.app",
   "https://finpulse-frontend.vercel.app",
   "http://127.0.0.1:5501",
