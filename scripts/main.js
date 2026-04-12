@@ -97,6 +97,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('loginBtn');
     const loginOverlay = document.getElementById('loginOverlay');
     const closeLoginBtn = document.getElementById('closeLoginBtn');
+    
+    // --- Mobile Menu Toggle ---
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navContent = document.querySelector('.nav-content');
+
+    if (mobileMenuBtn && navContent) {
+        mobileMenuBtn.addEventListener('click', () => {
+            navContent.classList.toggle('active');
+            
+            // Toggle icon (optional but nice)
+            const icon = mobileMenuBtn.querySelector('i');
+            if (icon && window.lucide) {
+                const isMenu = icon.getAttribute('data-lucide') === 'menu';
+                icon.setAttribute('data-lucide', isMenu ? 'x' : 'menu');
+                lucide.createIcons();
+            }
+        });
+
+        // Close menu when clicking a link
+        navContent.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navContent.classList.remove('active');
+            });
+        });
+    }
 
     if (loginBtn && loginOverlay) {
         loginBtn.addEventListener('click', (e) => {
