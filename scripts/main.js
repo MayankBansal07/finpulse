@@ -98,30 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginOverlay = document.getElementById('loginOverlay');
     const closeLoginBtn = document.getElementById('closeLoginBtn');
     
-    // --- Mobile Menu Toggle ---
-    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    const navContent = document.querySelector('.nav-content');
+    // Mobile menu toggle implemented below.
 
-    if (mobileMenuBtn && navContent) {
-        mobileMenuBtn.addEventListener('click', () => {
-            navContent.classList.toggle('active');
-            
-            // Toggle icon (optional but nice)
-            const icon = mobileMenuBtn.querySelector('i');
-            if (icon && window.lucide) {
-                const isMenu = icon.getAttribute('data-lucide') === 'menu';
-                icon.setAttribute('data-lucide', isMenu ? 'x' : 'menu');
-                lucide.createIcons();
-            }
-        });
-
-        // Close menu when clicking a link
-        navContent.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                navContent.classList.remove('active');
-            });
-        });
-    }
 
     if (loginBtn && loginOverlay) {
         loginBtn.addEventListener('click', (e) => {
@@ -156,22 +134,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Mobile Menu Toggle ---
+    // --- Modern Mobile Menu Toggle ---
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-    if (mobileMenuBtn) {
+    const navContent = document.querySelector('.nav-content');
+
+    if (mobileMenuBtn && navContent) {
         mobileMenuBtn.addEventListener('click', () => {
-            const navLinks = document.querySelector('.nav-links');
-            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
-            if (navLinks.style.display === 'flex') {
-                navLinks.style.flexDirection = 'column';
-                navLinks.style.position = 'absolute';
-                navLinks.style.top = '100%';
-                navLinks.style.left = '0';
-                navLinks.style.width = '100%';
-                navLinks.style.background = 'var(--secondary)';
-                navLinks.style.padding = '2rem';
-                navLinks.style.borderBottom = '1px solid var(--border-glass)';
+            navContent.classList.toggle('active');
+            
+            // Toggle icon
+            const icon = mobileMenuBtn.querySelector('i');
+            if (icon && window.lucide) {
+                const isMenu = icon.getAttribute('data-lucide') === 'menu';
+                icon.setAttribute('data-lucide', isMenu ? 'x' : 'menu');
+                lucide.createIcons();
             }
+        });
+
+        // Close menu when clicking a link
+        navContent.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navContent.classList.remove('active');
+            });
         });
     }
 
