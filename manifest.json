@@ -1,0 +1,21 @@
+{
+  "name": "FinPulse - Expert CA Services",
+  "short_name": "FinPulse",
+  "description": "Expert Chartered Accountant services for all your tax, audit, and advisory needs.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f57c3",
+  "icons": [
+    {
+      "src": "assets/finpulse_logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "assets/finpulse_logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

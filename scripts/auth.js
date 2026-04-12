@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnA.style.background = 'var(--primary)'; btnA.style.color = 'white';
                 btnC.style.background = '#f1f5f9'; btnC.style.color = '#475569';
                 if(emailLabel) emailLabel.textContent = 'Admin Email';
-                if(emailInput) { emailInput.type = 'email'; emailInput.placeholder = 'admin@finpulse.com'; }
+                if(emailInput) { emailInput.type = 'email'; emailInput.placeholder = 'admin@finpulse.works'; }
             });
             btnC.click();
         }

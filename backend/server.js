@@ -1,7 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const connectDB = require('./config/db');
 const Consultation = require('./models/Consultation');
 const User = require('./models/User'); // Added for seeding
@@ -50,7 +51,7 @@ app.use(cors({
     return callback(null, true);
   },
   methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
 }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -58,25 +59,66 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Configure SMTP transporter for Gmail (587 with TLS)
+// Configure Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Keeping nodemailer transporter for legacy/system mails if needed, 
+// but we will primarily use Resend for public contact forms.
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
-  secure: false,
-  requireTLS: true,
+  secure: true, 
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
   },
-  // logger: true,   // log to console
-  // debug: true     // include SMTP conversation
-  family: 4 // Use IPv4 to avoid potential IPv6 issues
+  family: 4
 });
 
 
-app.get("/", (req, res) => {
-  res.send("Backend is live");
-});
+// Helper for Fail-safe Email Delivery
+const sendFinPulseMail = async ({ to, subject, html, replyTo, type }) => {
+  const fromEmail = "consult@finpulse.works";
+  
+  // Attempt 1: Resend
+  try {
+    console.log(`[Email] Attempting Resend for ${type}...`);
+    const { data, error } = await resend.emails.send({
+      from: type === 'Admin' ? `FinPulse Website <${fromEmail}>` : `FinPulse Consultation <${fromEmail}>`,
+      to,
+      reply_to: replyTo,
+      subject,
+      html
+    });
+
+    if (!error && data && data.id) {
+      console.log(`[Email] Resend SUCCESS for ${type}: ${data.id}`);
+      return { success: true, provider: 'resend', id: data.id };
+    }
+    console.error(`[Email] Resend FAILED for ${type}:`, error || 'Unknown Error');
+  } catch (err) {
+    console.error(`[Email] Resend EXCEPTION for ${type}:`, err.message);
+  }
+
+  // Attempt 2: Fallback to Zoho (Nodemailer)
+  try {
+    console.log(`[Email] Falling back to ZOHO for ${type}...`);
+    const mailOptions = {
+      from: `"FinPulse" <${fromEmail}>`,
+      to,
+      replyTo,
+      subject,
+      html
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[Email] ZOHO SUCCESS for ${type}: ${info.messageId}`);
+    return { success: true, provider: 'zoho', id: info.messageId };
+  } catch (err) {
+    console.error(`[Email] ZOHO FAILED for ${type}:`, err.message);
+    return { success: false, error: err.message };
+  }
+};
 
 app.post('/api/contact', async (req, res) => {
   const { name, email, message } = req.body;
@@ -94,44 +136,56 @@ app.post('/api/contact', async (req, res) => {
       email,
       phone: req.body.phone || '',
       service: req.body.service || '',
-      message
+      message,
+      consent: req.body.consent || false
     });
 
-    // 1. Admin notification
-    try {
-      await transporter.sendMail({
-        from: process.env.SMTP_USER,        // ✅ must match your Gmail login
-        to: process.env.SMTP_USER,          // ✅ admin notification goes to your Gmail
-        replyTo: email,                     // ✅ lets you reply directly to the customer
-        subject: "New Contact Form",
-        text: `New request from ${name} (${email}): ${message}`, // plain text fallback
-        html: `
-      <h3>New Contact Request</h3>
-      <p><b>Name:</b> ${name}</p>
-      <p><b>Email:</b> ${email}</p>
-      <p><b>Message:</b> ${message}</p>
-    `
-      });
+    // 1. Admin Notification (Independent)
+    sendFinPulseMail({
+      to: "consult@finpulse.works",
+      replyTo: email,
+      subject: "New Contact Form Submission",
+      type: "Admin",
+      html: `
+        <h3>New Contact Request</h3>
+        <p><b>Name:</b> ${name}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Phone:</b> ${req.body.phone || 'N/A'}</p>
+        <p><b>Service:</b> ${req.body.service || 'N/A'}</p>
+        <p><b>Message:</b> ${message}</p>
+      `
+    });
 
-      const info = await transporter.sendMail({
-        from: process.env.SMTP_USER,        // ✅ must match your Gmail login
-        to: email,                          // ✅ customer’s email
-        replyTo: process.env.SMTP_USER,     // ✅ replies come back to you
-        subject: "FinPulse – Consultation Request Received",
-        text: `Hello ${name}, we received your message: "${message}". We'll contact you soon.`,
-        html: `
-      <h3>Hello ${name},</h3>
-      <p>We received your message:</p>
-      <p>"${message}"</p>
-      <br/>
-      <p>We will contact you soon.</p>
-      <p><b>FinPulse Team</b></p>
-    `
-      });
-      console.log("Customer mail sent:", info.messageId);
-    } catch (emailError) {
-      console.error("Email notification failed to send, but data was saved:", emailError.message);
-    }
+    // 2. Customer Auto-reply (Independent)
+    sendFinPulseMail({
+      to: email,
+      replyTo: "consult@finpulse.works",
+      subject: "FinPulse – Consultation Request Received",
+      type: "Customer",
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #2ECC71; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h2 style="margin: 0;">FinPulse Consultation</h2>
+          </div>
+          <div style="padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
+            <h3>Hello ${name},</h3>
+            <p>Thank you for reaching out to FinPulse. We have received your consultation request and confirmed your consent for us to contact you regarding your financial needs.</p>
+            
+            <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <p style="margin-top: 0; color: #64748b; font-size: 0.9rem;">Your Message Summary:</p>
+              <p style="font-style: italic; color: #1a365d; border-left: 3px solid #2ECC71; padding-left: 15px;">"${message}"</p>
+            </div>
+            
+            <p>One of our expert Chartered Accountants will review your details and contact you within the next 24 hours.</p>
+            <br/>
+            <p>Warm regards,</p>
+            <p><b>The FinPulse Team</b></p>
+            <hr style="border: 0; border-top: 1px solid #eee; margin-top: 30px;" />
+            <p style="font-size: 0.8em; color: #777; text-align: center;">This is an automated response based on your consent. Please do not reply directly to this email.</p>
+          </div>
+        </div>
+      `
+    });
 
     res.json({ success: true });
 
@@ -140,6 +194,7 @@ app.post('/api/contact', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 // Health check route
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
@@ -152,11 +207,11 @@ const seedAdmin = async () => {
     if (!adminExists) {
       await User.create({
         name: 'Super Admin',
-        email: process.env.SMTP_USER || 'admin@finpulse.com',
+        email: process.env.SMTP_USER || 'admin@finpulse.works',
         password: 'AdminPassword123!',
         role: 'admin'
       });
-      console.log("Default Admin created. Email: Use your SMTP_USER or admin@finpulse.com. Password: AdminPassword123!");
+      console.log("Default Admin created. Email: Use your SMTP_USER or admin@finpulse.works. Password: AdminPassword123!");
     }
   } catch (error) {
     console.error("Failed to seed admin:", error.message);
@@ -164,6 +219,9 @@ const seedAdmin = async () => {
 };
 
 app.listen(PORT, async () => {
+  console.log("------------------------------------------");
+  console.log("--- FINPULSE BACKEND V3 (FAILSAFE) LIVE ---");
+  console.log("------------------------------------------");
   await seedAdmin(); // Check for admin right when server starts
   console.log(`Server running on port ${PORT}`);
 });

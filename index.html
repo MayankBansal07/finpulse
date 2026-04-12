@@ -4,18 +4,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="FinPulse - Expert Chartered Accountant Services for all your tax, audit, and advisory needs.">
-    <title>FinPulse | Expert CA Services</title>
-    <!-- Modern Typography: Outfit for headers, Inter for body -->
+    <!-- Primary Meta Tags -->
+    <title>FinPulse | Expert Chartered Accountant Services in Gurgaon</title>
+    <meta name="title" content="FinPulse | Expert Chartered Accountant Services in Gurgaon">
+    <meta name="description" content="FinPulse offers expert CA services in Gurgaon including Tax Planning, GST Filing, Accounting, and Business Consulting. Trusted by 2,500+ clients for financial excellence.">
+    <meta name="keywords" content="FinPulse, CA in Gurgaon, Chartered Accountant Gurgaon, Tax Consultant, GST Filing Gurgaon, Accounting Services India, Top CA Firm Gurgaon">
+    <meta name="author" content="FinPulse">
+    <link rel="canonical" href="https://finpulse.works/index.html">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://finpulse.works/">
+    <meta property="og:title" content="FinPulse | Expert Chartered Accountant Services in Gurgaon">
+    <meta property="og:description" content="Your trusted financial partner for tax strategies, compliance, and growth. Expert CA services tailored for modern businesses.">
+    <meta property="og:image" content="https://finpulse.works/assets/finpulse_logo.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://finpulse.works/">
+    <meta property="twitter:title" content="FinPulse | Expert Chartered Accountant Services in Gurgaon">
+    <meta property="twitter:description" content="Expert CA services tailored for modern businesses. Optimized tax strategies and financial growth.">
+    <meta property="twitter:image" content="https://finpulse.works/assets/finpulse_logo.jpg">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "FinPulse",
+      "image": "https://finpulse.works/assets/finpulse_logo.jpg",
+      "@id": "https://finpulse.works/",
+      "url": "https://finpulse.works/",
+      "telephone": "+91 9509899680",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Sector 24 DLF phase 1",
+        "addressLocality": "Gurgaon",
+        "postalCode": "122001",
+        "addressRegion": "Haryana",
+        "addressCountry": "IN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 28.4595,
+        "longitude": 77.0266
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday"
+        ],
+        "opens": "09:00",
+        "closes": "18:00"
+      },
+      "sameAs": [
+        "https://www.facebook.com/finpulse",
+        "https://twitter.com/finpulse",
+        "https://www.linkedin.com/company/finpulse"
+      ]
+    }
+    </script>
+
+    <!-- Modern Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/lucide@latest/dist/umd/lucide.css" rel="stylesheet">
     <link rel="stylesheet" href="styles/main.css">
-    <!-- Google Analytics Tracker -->
+    
+    <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-7V45JN6JQE"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -24,6 +85,7 @@
       gtag('config', 'G-7V45JN6JQE');
     </script>
     <link rel="icon" type="image/jpeg" href="assets/finpulse_logo.jpg">
+    <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
@@ -139,7 +201,11 @@
                             <label>Message</label>
                             <textarea id="message" rows="4" placeholder="Tell us about your requirements..."></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Submit Request <i data-lucide="send"></i></button>
+                        <label class="form-consent">
+                            <input type="checkbox" id="consent" required>
+                            <span>I consent to FinPulse collecting my data to contact me regarding this request.</span>
+                        </label>
+                        <button type="submit" class="btn btn-primary">Submit Request <i data-lucide="send"></i></button>
                         <p id="formStatus" class="form-status"></p>
                     </form>
                 </div>
@@ -155,7 +221,7 @@
                             </div>
                             <div class="info-item">
                                 <div class="info-icon"><i data-lucide="mail"></i></div>
-                                <span>consult@finpulse.com</span>
+                                <span>consult@finpulse.works</span>
                             </div>
                             <div class="info-item">
                                 <div class="info-icon"><i data-lucide="map-pin"></i></div>
@@ -230,7 +296,7 @@
                     <ul class="footer-contact-info">
                         <li><i data-lucide="map-pin"></i> Sector 24 DLF phase 1 gurgaon 122001</li>
                         <li><i data-lucide="phone"></i> +91 9509899680</li>
-                        <li><i data-lucide="mail"></i> consult@finpulse.com</li>
+                        <li><i data-lucide="mail"></i> consult@finpulse.works</li>
                     </ul>
                 </div>
             </div>

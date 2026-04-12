@@ -685,6 +685,27 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
 }
 
+.form-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 1rem 0 1.5rem;
+  cursor: pointer;
+}
+
+.form-consent input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+.form-consent span {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
 /* Contact Section (Light Theme) */
 .contact-layout {
   display: grid;

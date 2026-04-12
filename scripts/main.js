@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const REMOTE_API_BASE = 'https://finpulse-backend-v2.onrender.com/api';
-    const LOCAL_API_PORTS = ['5000', '5005'];
+    const LOCAL_API_PORTS = ['5005', '5000'];
     const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
     const probeHealth = async (origin) => {
@@ -39,10 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        return `${window.location.protocol}//${window.location.hostname}:5000/api`;
+        return `${window.location.protocol}//${window.location.hostname}:5005/api`;
     };
 
-    const apiBasePromise = resolveApiBase();
+    const apiBasePromise = resolveApiBase().then(base => {
+        console.log(`[FinPulse] API Base Resolved: ${base}`);
+        return base;
+    });
     const apiFetch = async (path, options = {}) => {
         const base = await apiBasePromise;
         return fetch(`${base}${path}`, options);
@@ -189,7 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 email: document.getElementById('email').value,
                 phone: document.getElementById('phone').value,
                 service: document.getElementById('service').value,
-                message: document.getElementById('message').value
+                message: document.getElementById('message').value,
+                consent: document.getElementById('consent').checked
             };
 
             apiFetch('/contact', {

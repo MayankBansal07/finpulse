@@ -6,6 +6,7 @@ const consultationSchema = new mongoose.Schema({
   phone: { type: String },
   service: { type: String },
   message: { type: String },
+  consent: { type: Boolean, default: false },
   status: { type: String, enum: ['New', 'Contacted', 'Resolved'], default: 'New' }
 }, { timestamps: true });
 
