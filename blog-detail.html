@@ -43,7 +43,7 @@
             <div class="blog-header">
                 <h1 class="blog-title" id="dTitle"></h1>
                 <div class="blog-meta">
-                    <div><i data-lucide="user"></i> admin@finpulse.works</div>
+                    <div><i data-lucide="user"></i> <span id="dAuthor">admin@finpulse.works</span></div>
                     <div><i data-lucide="calendar"></i> <span id="dDate"></span></div>
                 </div>
             </div>
@@ -120,6 +120,7 @@
                 const blog = await res.json();
                 
                 document.getElementById('dTitle').textContent = blog.title;
+                document.getElementById('dAuthor').textContent = blog.authorSignature || 'admin@finpulse.works';
                 document.getElementById('dDate').textContent = new Date(blog.createdAt).toLocaleDateString();
                 document.getElementById('dImage').src = blog.image;
                 document.getElementById('dContent').textContent = blog.content || '';

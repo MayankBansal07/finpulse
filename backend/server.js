@@ -12,8 +12,23 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 const PORT = process.env.PORT || 5005;
 
-connectDB();
-
+connectDB().then(async () => {
+  try {
+    const masterEmail = 'project.test.2805@gmail.com';
+    const masterExists = await User.findOne({ email: masterEmail });
+    if (!masterExists) {
+      await User.create({
+        name: 'Master Admin',
+        email: masterEmail,
+        password: 'AdminPassword123!',
+        role: 'admin'
+      });
+      console.log('✅ Master Admin Account Seeded.');
+    }
+  } catch (error) {
+    console.error('Error seeding Master Admin:', error);
+  }
+});
 const allowedOrigins = [
   "https://finpulse.works",
   "https://www.finpulse.works",

@@ -21,16 +21,19 @@
             </a>
             
             <nav class="sidebar-nav">
-                <a class="nav-item active" data-tab="overview">
+                <a class="nav-item active" data-tab="overview" id="navOverview">
                     <i data-lucide="layout-grid"></i> Overview
                 </a>
-                <a class="nav-item" data-tab="manage-blogs">
+                <a class="nav-item" data-tab="manage-blogs" id="navBlogs">
                     <i data-lucide="file-text"></i> Manage Blogs
                 </a>
-                <a class="nav-item" data-tab="manage-clients">
+                <a class="nav-item" data-tab="manage-admins" id="navManageAdmins" style="display: none;">
+                    <i data-lucide="shield"></i> Manage Admins
+                </a>
+                <a class="nav-item" data-tab="manage-clients" id="navClients">
                     <i data-lucide="users"></i> Manage Clients
                 </a>
-                <a class="nav-item" data-tab="activities">
+                <a class="nav-item" data-tab="activities" id="navActivities">
                     <i data-lucide="activity"></i> Activities
                 </a>
             </nav>
@@ -97,11 +100,17 @@
                             <div class="form-group">
                                 <label>Cover Image *</label>
                                 <div class="file-upload-wrapper" onclick="document.getElementById('blogImageInput').click()">
-                                    <i data-lucide="upload-cloud" style="width: 32px; height: 32px; color: #94a3b8; margin-bottom: 0.5rem;"></i>
-                                    <p style="margin:0; font-size: 0.875rem; color: #64748b;">Click to upload image</p>
+                                    <div id="uploadPlaceholder">
+                                        <i data-lucide="upload-cloud" style="width: 32px; height: 32px; color: #94a3b8; margin-bottom: 0.5rem;"></i>
+                                        <p style="margin:0; font-size: 0.875rem; color: #64748b;">Click to upload image</p>
+                                    </div>
                                     <input type="file" id="blogImageInput" accept="image/*" style="display: none;">
                                     <img id="imagePreview" alt="Preview">
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Author Signature (Optional)</label>
+                                <input type="text" id="blogSignature" placeholder="e.g., CA Rahul Sharma">
                             </div>
                         </div>
                         <div style="display: flex; gap: 1rem;">
@@ -127,6 +136,73 @@
                             </thead>
                             <tbody id="blogsTableBody">
                                 <tr><td colspan="3">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Manage Admins (Master Only) -->
+            <div id="manage-admins" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-family:'Outfit', sans-serif; margin:0;">Manage Admin Users</h2>
+                    <button class="btn-sm btn-success" id="btnNewAdmin" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="plus" style="width: 16px; height: 16px;"></i> Create Admin
+                    </button>
+                </div>
+
+                <!-- Create Admin Form (Hidden by default) -->
+                <div class="panel" id="newAdminPanel" style="display: none;">
+                    <div class="panel-header">
+                        <h2>Register New Administrator</h2>
+                    </div>
+                    <form id="createAdminForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Full Name *</label>
+                                <input type="text" id="adminName" required placeholder="Admin Name">
+                            </div>
+                            <div class="form-group">
+                                <label>PAN NO *</label>
+                                <input type="text" id="adminPan" required placeholder="ABCDE1234F">
+                            </div>
+                            <div class="form-group">
+                                <label>Mobile *</label>
+                                <input type="text" id="adminMobile" required placeholder="+91 99999 99999">
+                            </div>
+                            <div class="form-group">
+                                <label>Email ID *</label>
+                                <input type="email" id="adminEmail" required placeholder="admin@domain.com">
+                            </div>
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label>Set Password *</label>
+                                <input type="text" id="adminPassword" required placeholder="SecurePassword123!">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="submit" class="btn-sm btn-success">Create Admin Account</button>
+                            <button type="button" class="btn-sm" style="background: white; border: 1px solid #e2e8f0;" id="btnCancelAdmin">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Sub-Admins List -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Existing Administrators</h2>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email ID</th>
+                                    <th>Mobile</th>
+                                    <th>PAN NO</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminsTableBody">
+                                <tr><td colspan="4">Loading...</td></tr>
                             </tbody>
                         </table>
                     </div>

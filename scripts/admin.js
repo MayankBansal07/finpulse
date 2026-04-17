@@ -61,6 +61,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('userAvatar').textContent = user.name ? user.name.charAt(0).toUpperCase() : 'A';
     document.getElementById('userEmailDisplay').textContent = user.email;
 
+    if (user.email === 'admin@finpulse.works') {
+        document.body.classList.add('master-admin-theme');
+        const navManageAdmins = document.getElementById('navManageAdmins');
+        if (navManageAdmins) navManageAdmins.style.display = 'flex';
+    } else {
+        // Sub-admin logic
+        const restrictedNavs = ['navOverview', 'navClients', 'navActivities'];
+        restrictedNavs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+
+        // Default to blogs tab
+        document.getElementById('overview').classList.remove('active');
+        document.getElementById('manage-blogs').classList.add('active');
+        document.getElementById('pageTitle').textContent = 'Manage Blogs';
+        const navBlogs = document.getElementById('navBlogs');
+        if (navBlogs) navBlogs.classList.add('active');
+    }
+
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
@@ -98,6 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tabTexts = {
                 'overview': 'Admin Dashboard',
                 'manage-blogs': 'Manage Blogs',
+                'manage-admins': 'Manage Admin Users',
                 'manage-clients': 'Manage Clients',
                 'activities': 'User Activities'
             };
@@ -122,6 +143,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     document.getElementById('btnCancelSupport').addEventListener('click', () => toggleDisplay('supportPanel', false));
 
+    const btnNewAdmin = document.getElementById('btnNewAdmin');
+    if (btnNewAdmin) btnNewAdmin.addEventListener('click', () => toggleDisplay('newAdminPanel', true));
+    const btnCancelAdmin = document.getElementById('btnCancelAdmin');
+    if (btnCancelAdmin) btnCancelAdmin.addEventListener('click', () => toggleDisplay('newAdminPanel', false));
+
     // Blog Image Upload Preview
     let uploadedImageBase64 = null;
     document.getElementById('blogImageInput').addEventListener('change', (e) => {
@@ -131,8 +157,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             reader.onload = (event) => {
                 uploadedImageBase64 = event.target.result;
                 const preview = document.getElementById('imagePreview');
+                const placeholder = document.getElementById('uploadPlaceholder');
                 preview.src = uploadedImageBase64;
                 preview.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'none';
             };
             reader.readAsDataURL(file);
         }
@@ -140,6 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Data Loaders
     const loadStats = async () => {
+        if (user.email !== 'admin@finpulse.works') return;
         try {
             const res = await apiFetch('/admin/stats', { headers });
             if (res.ok) {
@@ -242,11 +271,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch(e) { console.error('Error loading activities:', e); }
     };
 
+    const loadSubAdmins = async () => {
+        if (user.email !== 'admin@finpulse.works') return;
+        try {
+            const res = await apiFetch('/admin/subadmins', { headers });
+            const data = await res.json();
+            const tbody = document.getElementById('adminsTableBody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">No sub-admins found.</td></tr>';
+                return;
+            }
+
+            data.forEach(adminData => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 500;">${adminData.name}</td>
+                    <td>${adminData.email}</td>
+                    <td>${adminData.phone || 'N/A'}</td>
+                    <td>${adminData.panNumber || 'N/A'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            loadStats();
+        } catch(e) { console.error('Error loading admins:', e); }
+    };
+
     // Submissions
     document.getElementById('createBlogForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const title = document.getElementById('blogTitle').value;
         const content = document.getElementById('blogContent').value;
+        const authorSignature = document.getElementById('blogSignature') ? document.getElementById('blogSignature').value : '';
         if (!uploadedImageBase64) {
             alert('Please select an image');
             return;
@@ -256,12 +314,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const res = await apiFetch('/admin/blogs', {
                 method: 'POST',
                 headers,
-                body: JSON.stringify({ title, content, image: uploadedImageBase64 })
+                body: JSON.stringify({ title, content, image: uploadedImageBase64, authorSignature })
             });
 
             if(res.ok) {
                 document.getElementById('createBlogForm').reset();
                 document.getElementById('imagePreview').style.display = 'none';
+                const placeholder = document.getElementById('uploadPlaceholder');
+                if (placeholder) placeholder.style.display = 'block';
                 uploadedImageBase64 = null;
                 toggleDisplay('newBlogPanel', false);
                 loadBlogs();
@@ -330,6 +390,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    const createAdminForm = document.getElementById('createAdminForm');
+    if (createAdminForm) {
+        createAdminForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('adminName').value;
+            const panNumber = document.getElementById('adminPan').value;
+            const phone = document.getElementById('adminMobile').value;
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+
+            try {
+                const res = await apiFetch('/admin/subadmins', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ name, panNumber, phone, email, password })
+                });
+
+                if(res.ok) {
+                    createAdminForm.reset();
+                    toggleDisplay('newAdminPanel', false);
+                    loadSubAdmins();
+                } else {
+                    const data = await res.json();
+                    alert(`Error: ${data.message}`);
+                }
+            } catch(e) { alert(`Error: ${e.message}`); }
+        });
+    }
+
     // Global Action functions
     window.openSupportModal = (id, name, phone, email) => {
         document.getElementById('supportClientId').value = id;
@@ -369,9 +458,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // Initial Load
-    await loadStats();
-    await loadBlogs();
-    await loadClients();
-    await loadActivities();
+    if (user.email === 'admin@finpulse.works') {
+        document.body.classList.add('master-admin-theme');
+        loadClients();
+        loadActivities();
+        loadStats();
+        loadSubAdmins();
+    } else {
+        document.querySelectorAll('.restricted').forEach(el => el.style.display = 'none');
+    }
+    loadBlogs();
 
 });

@@ -10,6 +10,7 @@ const { protect, admin } = require('../middleware/auth');
 // @desc    Admin manually creates a new client
 // @access  Private/Admin
 router.post('/clients', protect, admin, async (req, res) => {
+  if (req.user.email !== 'admin@finpulse.works') return res.status(403).json({ message: 'Forbidden' });
   let email = req.body.email;
   const { name, password, phone } = req.body;
 
@@ -31,6 +32,7 @@ router.post('/clients', protect, admin, async (req, res) => {
       email,
       password: defaultPassword,
       phone,
+      createdBy: req.user._id,
       role: 'client',
     });
 
@@ -54,7 +56,9 @@ router.post('/clients', protect, admin, async (req, res) => {
 // @access  Private/Admin
 router.get('/clients', protect, admin, async (req, res) => {
   try {
-    const clients = await User.find({ role: 'client' }).select('-password');
+    if (req.user.email !== 'admin@finpulse.works') return res.status(403).json({ message: 'Forbidden' });
+    let query = { role: 'client' };
+    const clients = await User.find(query).select('-password');
     res.json(clients);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -66,6 +70,9 @@ router.get('/clients', protect, admin, async (req, res) => {
 // @access  Private/Admin
 router.get('/consultations', protect, admin, async (req, res) => {
   try {
+    if (req.user.email !== 'admin@finpulse.works') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
     const consultations = await Consultation.find({}).sort({ createdAt: -1 });
     res.json(consultations);
   } catch (error) {
@@ -75,6 +82,7 @@ router.get('/consultations', protect, admin, async (req, res) => {
 
 // @route   DELETE /api/admin/clients/:id
 router.delete('/clients/:id', protect, admin, async (req, res) => {
+  if (req.user.email !== 'admin@finpulse.works') return res.status(403).json({ message: 'Forbidden' });
   try {
     await User.findByIdAndDelete(req.params.id);
     res.json({ message: 'Client deleted' });
@@ -85,6 +93,7 @@ router.delete('/clients/:id', protect, admin, async (req, res) => {
 
 // @route   PUT /api/admin/clients/:id/password
 router.put('/clients/:id/password', protect, admin, async (req, res) => {
+  if (req.user.email !== 'admin@finpulse.works') return res.status(403).json({ message: 'Forbidden' });
   try {
     const user = await User.findById(req.params.id);
     if (user) {
@@ -104,6 +113,7 @@ router.put('/clients/:id/password', protect, admin, async (req, res) => {
 // @desc    Assign Support person to client
 // @access  Private/Admin
 router.put('/clients/:id/support', protect, admin, async (req, res) => {
+  if (req.user.email !== 'admin@finpulse.works') return res.status(403).json({ message: 'Forbidden' });
   try {
     const user = await User.findById(req.params.id);
     if (user) {
@@ -148,8 +158,8 @@ router.get('/blogs/:id', async (req, res) => {
 // @route   POST /api/admin/blogs
 router.post('/blogs', protect, admin, async (req, res) => {
   try {
-    const { title, content, image } = req.body;
-    const blog = await Blog.create({ title, content, image });
+    const { title, content, image, authorSignature } = req.body;
+    const blog = await Blog.create({ title, content, image, authorId: req.user._id, authorSignature });
     await Activity.create({ userEmail: req.user.email, role: 'admin', action: 'Created Blog' });
     res.status(201).json(blog);
   } catch (error) {
@@ -192,7 +202,9 @@ router.post('/blogs/:id/comments', async (req, res) => {
 // @route   GET /api/admin/activities
 router.get('/activities', protect, admin, async (req, res) => {
   try {
-    const activities = await Activity.find({}).sort({ createdAt: -1 }).limit(50);
+    if (req.user.email !== 'admin@finpulse.works') return res.status(403).json({ message: 'Forbidden' });
+    let query = {};
+    const activities = await Activity.find(query).sort({ createdAt: -1 }).limit(50);
     res.json(activities);
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
@@ -202,10 +214,60 @@ router.get('/activities', protect, admin, async (req, res) => {
 // @route   GET /api/admin/stats
 router.get('/stats', protect, admin, async (req, res) => {
   try {
-    const totalClients = await User.countDocuments({ role: 'client' });
+    if (req.user.email !== 'admin@finpulse.works') return res.status(403).json({ message: 'Forbidden' });
+    let clientQuery = { role: 'client' };
+    const totalClients = await User.countDocuments(clientQuery);
     const totalAdmins = await User.countDocuments({ role: 'admin' });
     const publishedBlogs = await Blog.countDocuments();
     res.json({ totalClients, totalAdmins, publishedBlogs });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+// @route   GET /api/admin/subadmins
+// @desc    Get all sub-admins (Master Admin Only)
+router.get('/subadmins', protect, admin, async (req, res) => {
+  try {
+    if (req.user.email !== 'admin@finpulse.works') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    const admins = await User.find({ role: 'admin', email: { $ne: 'admin@finpulse.works' } }).select('-password');
+    res.json(admins);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/admin/subadmins
+// @desc    Create a new sub-admin (Master Admin Only)
+router.post('/subadmins', protect, admin, async (req, res) => {
+  try {
+    if (req.user.email !== 'admin@finpulse.works') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    const { name, panNumber, phone, email, password } = req.body;
+    
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    const user = await User.create({
+      name,
+      email,
+      password: password || 'AdminPass123!',
+      phone,
+      panNumber,
+      role: 'admin',
+      createdBy: req.user._id
+    });
+
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }

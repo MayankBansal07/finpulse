@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
   clientId: { type: String },
   password: { type: String, required: true },
   phone: { type: String },
+  panNumber: { type: String },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   role: { type: String, enum: ['client', 'admin'], default: 'client' },
   assignedSupport: {
     name: { type: String },
