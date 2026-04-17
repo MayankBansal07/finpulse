@@ -1569,3 +1569,143 @@ body.master-admin-theme .kpi-card:nth-child(3) {
 .toast-notification.show {
     transform: translateX(-50%) translateY(0);
 }
+
+/* --- Floating Query Widget --- */
+.floating-query-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.floating-query-btn {
+    width: 60px;
+    height: 60px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    outline: none;
+}
+
+.floating-query-btn:hover {
+    transform: scale(1.1) rotate(15deg);
+    background-color: var(--primary-hover);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+}
+
+.floating-query-btn i {
+    width: 30px;
+    height: 30px;
+}
+
+.query-modal {
+    width: 350px;
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.4s ease;
+}
+
+.query-modal.active {
+    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.query-modal-header {
+    background: var(--bg-main-top);
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.query-modal-header h3 {
+    color: white;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.close-query-modal {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-query-modal:hover {
+    color: white;
+}
+
+.query-modal-body {
+    padding: 1.5rem;
+}
+
+.query-modal-body .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.query-modal-body label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    display: block;
+    color: var(--text-main);
+}
+
+.query-modal-body input, 
+.query-modal-body textarea {
+    background-color: #f1f5f9;
+    font-size: 0.9rem;
+    padding: 0.75rem;
+}
+
+.query-modal-footer {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.query-submit-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.query-submit-btn:hover {
+    background: var(--primary-hover);
+}
+
+@media (max-width: 480px) {
+    .floating-query-container {
+        bottom: 1rem;
+        right: 1rem;
+    }
+    
+    .query-modal {
+        width: calc(100vw - 2rem);
+    }
+}

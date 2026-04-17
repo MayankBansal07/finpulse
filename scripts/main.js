@@ -231,4 +231,112 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
         });
     }
+
+    // --- Floating Query Feature ---
+    function initFloatingQuery() {
+        // Create HTML structure
+        const queryHTML = `
+            <div class="floating-query-container">
+                <div class="query-modal" id="queryModal">
+                    <div class="query-modal-header">
+                        <h3>Ask a Question</h3>
+                        <button class="close-query-modal" id="closeQueryModal">
+                            <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                        </button>
+                    </div>
+                    <form id="floatingQueryForm">
+                        <div class="query-modal-body">
+                            <div class="form-group">
+                                <label>Your Email ID</label>
+                                <input type="email" id="queryEmail" placeholder="you@example.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Your Question</label>
+                                <textarea id="queryMessage" rows="4" placeholder="How can we help you?" required></textarea>
+                            </div>
+                        </div>
+                        <div class="query-modal-footer">
+                            <button type="submit" class="query-submit-btn" id="querySubmitBtn">Send Question</button>
+                        </div>
+                    </form>
+                </div>
+                <button class="floating-query-btn" id="openQueryBtn" title="Ask a Question">
+                    <i data-lucide="help-circle"></i>
+                </button>
+            </div>
+        `;
+
+        // Inject into body
+        document.body.insertAdjacentHTML('beforeend', queryHTML);
+
+        // State & Elements
+        const modal = document.getElementById('queryModal');
+        const openBtn = document.getElementById('openQueryBtn');
+        const closeBtn = document.getElementById('closeQueryModal');
+        const form = document.getElementById('floatingQueryForm');
+
+        // Toggle logic
+        openBtn.onclick = () => {
+            const isActive = modal.classList.contains('active');
+            if (isActive) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 400);
+            } else {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('active'), 10);
+            }
+        };
+
+        closeBtn.onclick = () => {
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 400);
+        };
+
+        // Form Submission
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('querySubmitBtn');
+            const originalText = btn.textContent;
+            
+            const email = document.getElementById('queryEmail').value;
+            const question = document.getElementById('queryMessage').value;
+
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
+
+            try {
+                const response = await apiFetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, question })
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to send');
+
+                // Success State
+                form.innerHTML = `
+                    <div style="padding: 2rem; text-align: center;">
+                        <div style="width: 50px; height: 50px; background: #2ECC71; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i data-lucide="check" style="width: 30px; height: 30px;"></i>
+                        </div>
+                        <h4 style="color: #0f172a; margin-bottom: 0.5rem;">Sent Successfully!</h4>
+                        <p style="font-size: 0.85rem; color: #64748b;">Our team will contact you at <strong>${email}</strong> soon.</p>
+                        <button type="button" class="btn btn-primary" style="margin-top: 1.5rem; width: 100%;" onclick="this.closest('.query-modal').classList.remove('active'); setTimeout(() => this.closest('.query-modal').style.display='none', 400);">Close</button>
+                    </div>
+                `;
+                if (window.lucide) lucide.createIcons();
+                
+            } catch (err) {
+                alert(err.message);
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        // Initial Icon Sync
+        if (window.lucide) lucide.createIcons();
+    }
+
+    initFloatingQuery();
 });

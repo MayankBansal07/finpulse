@@ -1,0 +1,14 @@
+[dotenv@17.3.1] injecting env (11) from .env -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
+------------------------------------------
+--- FINPULSE BACKEND V3 (FAILSAFE) LIVE ---
+------------------------------------------
+MongoDB Connected: ac-hz6zczb-shard-00-00.6oaepai.mongodb.net
+Server running on port 5005
+[Email] Attempting Resend for Admin...
+[Email] Resend SUCCESS for Admin: 59fc65b8-4abe-4413-95a6-38b83c6e54ce
+[Email] Attempting Resend for Confirmation...
+[Email] Resend SUCCESS for Confirmation: 74f5b458-14b2-498e-a8ef-9eefbdf00898
+[Email] Attempting Resend for Admin...
+[Email] Resend SUCCESS for Admin: 368c926e-b7c8-4802-a4df-30388efbdffe
+[Email] Attempting Resend for Confirmation...
+[Email] Resend SUCCESS for Confirmation: e9c92d75-196b-4abd-ad7d-afdc17514c20

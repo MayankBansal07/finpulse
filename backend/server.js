@@ -210,6 +210,76 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
+// Floating Ask Question Logic
+app.post('/api/ask', async (req, res) => {
+  try {
+    const { email, question } = req.body;
+    if (!email || !question) {
+      return res.status(400).json({ error: 'Email and question are required' });
+    }
+
+    // Save as a consultation with a special flag/name
+    const query = await Consultation.create({ 
+      name: 'Quick Query',
+      email,
+      message: question,
+      service: 'General Query',
+      status: 'New'
+    });
+
+    // Send Notification to Admin
+    await sendFinPulseMail({
+      to: "consult@finpulse.works",
+      replyTo: email,
+      subject: `Quick Query: ${email}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <div style="background-color: #2ECC71; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h2 style="margin: 0;">New Site Query</h2>
+          </div>
+          <div style="padding: 30px;">
+            <p><strong>From:</strong> ${email}</p>
+            <p><strong>Question:</strong></p>
+            <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; border-left: 4px solid #2ECC71;">
+              "${question}"
+            </div>
+            <p style="margin-top: 20px; font-size: 0.9rem; color: #666;">You can reply directly to this email to contact the user.</p>
+          </div>
+        </div>
+      `,
+      type: 'Admin'
+    });
+
+    // Send Auto-reply to User
+    await sendFinPulseMail({
+      to: email,
+      subject: "Query Received - FinPulse",
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <div style="background-color: #1e3a8a; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h2 style="margin: 0;">FinPulse Support</h2>
+          </div>
+          <div style="padding: 30px;">
+            <p>Hello,</p>
+            <p>Thank you for reaching out to FinPulse! We've received your query:</p>
+            <blockquote style="background-color: #f8fafc; padding: 15px; border-radius: 8px; font-style: italic;">"${question}"</blockquote>
+            <p>Our team of experts will review your question and get back to you at this email address soon.</p>
+            <br/>
+            <p>Warm regards,</p>
+            <p><b>The FinPulse Team</b></p>
+          </div>
+        </div>
+      `,
+      type: 'Confirmation'
+    });
+
+    res.json({ success: true, message: 'Query submitted successfully' });
+  } catch (error) {
+    console.error("[Ask] Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Health check route
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
