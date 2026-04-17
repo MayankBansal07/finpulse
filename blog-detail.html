@@ -50,6 +50,25 @@
             <img src="" alt="Blog Cover" class="blog-image" id="dImage">
             <div class="blog-content" id="dContent" style="white-space: pre-wrap;"></div>
 
+            <!-- Sharing Section -->
+            <div class="share-article-section" style="margin-top: 3rem; padding: 2rem; background: white; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <h4 style="margin-bottom: 1rem; font-family: 'Outfit', sans-serif; color: #0f172a;">Share this article</h4>
+                <div class="share-container">
+                    <button id="shareWhatsApp" class="share-btn whatsapp" title="Share on WhatsApp">
+                        <i data-lucide="phone" style="width: 20px; height: 20px;"></i>
+                    </button>
+                    <button id="shareLinkedIn" class="share-btn linkedin" title="Share on LinkedIn">
+                        <i data-lucide="linkedin" style="width: 20px; height: 20px;"></i>
+                    </button>
+                    <button id="shareCopy" class="share-btn" title="Copy Link">
+                        <i data-lucide="link" style="width: 20px; height: 20px;"></i>
+                    </button>
+                    <button id="shareNative" class="share-btn" title="More Sharing Options">
+                        <i data-lucide="share-2" style="width: 20px; height: 20px;"></i>
+                    </button>
+                </div>
+            </div>
+
             <div class="comments-section" style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
                 <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; margin-bottom: 1.5rem; color: #0f172a;">Comments</h3>
                 
@@ -180,10 +199,77 @@
                     lucide.createIcons();
                 }
 
+                // Sharing Event Listeners
+                const shareTitle = blog.title;
+                const shareUrl = window.location.href;
+
+                document.getElementById('shareWhatsApp').onclick = () => {
+                    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareTitle + ': ' + shareUrl)}`, '_blank');
+                };
+
+                document.getElementById('shareLinkedIn').onclick = () => {
+                    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
+                };
+
+                document.getElementById('shareCopy').onclick = () => {
+                    copyToClipboard(shareUrl);
+                };
+
+                document.getElementById('shareNative').onclick = async () => {
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                title: shareTitle,
+                                text: `Check out this blog: ${shareTitle}`,
+                                url: shareUrl,
+                            });
+                        } catch (err) {
+                            if (err.name !== 'AbortError') copyToClipboard(shareUrl);
+                        }
+                    } else {
+                        copyToClipboard(shareUrl);
+                    }
+                };
+
             } catch(e) {
                 document.getElementById('loadingIndicator').innerHTML = `<p style="color:red;">Failed to grab blog: ${e.message}</p>`;
             }
         });
+
+        // Reusable Sharing Helpers
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Link copied to clipboard!');
+            }).catch(err => {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('Link copied to clipboard!');
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+
+        function showToast(message) {
+            let toast = document.getElementById('shareToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'shareToast';
+                toast.className = 'toast-notification';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<i data-lucide="check-circle" style="width: 18px; height: 18px; color: #2ecc71;"></i> ${message}`;
+            lucide.createIcons();
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
     </script>
 </body>
 </html>

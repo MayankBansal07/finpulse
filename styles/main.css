@@ -1505,3 +1505,67 @@ body.master-admin-theme .kpi-card:nth-child(3) {
   border: 1px solid #86efac;
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
 }
+
+/* Sharing Styles */
+.share-container {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    background: white;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.share-btn:hover {
+    background: #f1f5f9;
+    color: var(--primary);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.share-btn.whatsapp:hover {
+    color: #25D366;
+    border-color: #25D366;
+    background: rgba(37, 211, 102, 0.05);
+}
+
+.share-btn.linkedin:hover {
+    color: #0A66C2;
+    border-color: #0A66C2;
+    background: rgba(10, 102, 194, 0.05);
+}
+
+.toast-notification {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #0f172a;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 500;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.toast-notification.show {
+    transform: translateX(-50%) translateY(0);
+}

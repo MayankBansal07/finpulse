@@ -348,11 +348,12 @@
                 blogs.forEach(blog => {
                     const date = new Date(blog.createdAt).toLocaleDateString();
                     const snippet = blog.content ? (blog.content.substring(0, 100) + '...') : '';
+                    const imageUrl = blog.image || (blog.imagePublicId ? `https://res.cloudinary.com/dbzyykpgp/image/upload/${blog.imagePublicId}` : 'assets/finpulse_logo.jpg');
                     
                     const card = document.createElement('div');
                     card.style.cssText = 'background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; display: flex; flex-direction: column;';
                     card.innerHTML = `
-                        <img src="${blog.image || 'assets/finpulse_logo.jpg'}" alt="Blog Image" style="width: 100%; height: 200px; object-fit: cover;">
+                        <img src="${imageUrl}" alt="Blog Image" style="width: 100%; height: 200px; object-fit: cover;">
                         <div style="padding: 1.5rem; display: flex; flex-direction: column; flex-grow: 1;">
                             <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a; line-height: 1.3;">${blog.title}</h3>
                             <div style="display: flex; gap: 1rem; color: #64748b; font-size: 0.85rem; margin-bottom: 1rem; align-items: center;">
@@ -360,8 +361,11 @@
                                 <div style="display: flex; align-items: center; gap: 0.25rem;"><i data-lucide="calendar" style="width:14px;height:14px;"></i> ${date}</div>
                             </div>
                             <p style="color: #475569; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; flex-grow: 1;">${snippet}</p>
-                            <div style="display: flex; gap: 0.5rem;">
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
                                 <a href="blog-detail.html?id=${blog._id}" style="text-decoration: none; text-align: center; flex-grow: 1; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; color: #22c55e; font-weight: 600; display: block; transition: all 0.2s;">Read More</a>
+                                <button onclick="shareBlog('${blog.title.replace(/'/g, "\\'")}', '${window.location.origin}/blog-detail.html?id=${blog._id}')" class="share-btn" title="Share Blog">
+                                    <i data-lucide="share-2" style="width: 18px; height: 18px;"></i>
+                                </button>
                             </div>
                         </div>
                     `;
@@ -373,6 +377,57 @@
                 document.getElementById('blogsContainer').innerHTML = '<p style="text-align: center; width: 100%; color: #ef4444;">Failed to load blogs.</p>';
             }
         });
+
+        // Global Sharing Logic
+        async function shareBlog(title, url) {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: title,
+                        text: `Check out this blog: ${title}`,
+                        url: url,
+                    });
+                } catch (err) {
+                    if (err.name !== 'AbortError') copyToClipboard(url);
+                }
+            } else {
+                copyToClipboard(url);
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Link copied to clipboard!');
+            }).catch(err => {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('Link copied to clipboard!');
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+
+        function showToast(message) {
+            let toast = document.getElementById('shareToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'shareToast';
+                toast.className = 'toast-notification';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<i data-lucide="check-circle" style="width: 18px; height: 18px; color: #2ecc71;"></i> ${message}`;
+            lucide.createIcons();
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
     </script>
 </body>
 </html>

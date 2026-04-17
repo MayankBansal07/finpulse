@@ -5,6 +5,7 @@ const Consultation = require('../models/Consultation');
 const Blog = require('../models/Blog');
 const Activity = require('../models/Activity');
 const { protect, admin } = require('../middleware/auth');
+const { uploadImage } = require('../config/cloudinary');
 
 // @route   POST /api/admin/clients
 // @desc    Admin manually creates a new client
@@ -136,7 +137,7 @@ router.put('/clients/:id/support', protect, admin, async (req, res) => {
 // @route   GET /api/admin/blogs
 router.get('/blogs', async (req, res) => {
   try {
-    const blogs = await Blog.find({}).select('-image').sort({ createdAt: -1 });
+    const blogs = await Blog.find({}).sort({ createdAt: -1 });
     res.json(blogs);
   } catch (error) {
     console.error('Error fetching blogs:', error);
@@ -158,11 +159,20 @@ router.get('/blogs/:id', async (req, res) => {
 // @route   POST /api/admin/blogs
 router.post('/blogs', protect, admin, async (req, res) => {
   try {
-    const { title, content, image, authorSignature } = req.body;
+    let { title, content, image, authorSignature } = req.body;
+    
+    // If image is a base64 string, upload to Cloudinary
+    if (image && image.startsWith('data:image')) {
+      console.log('Detected Base64 image, uploading to Cloudinary...');
+      image = await uploadImage(image);
+      console.log('Upload successful:', image);
+    }
+
     const blog = await Blog.create({ title, content, image, authorId: req.user._id, authorSignature });
     await Activity.create({ userEmail: req.user.email, role: 'admin', action: 'Created Blog' });
     res.status(201).json(blog);
   } catch (error) {
+    console.error('Blog creation error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
