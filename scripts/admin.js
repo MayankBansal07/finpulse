@@ -81,6 +81,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (navBlogs) navBlogs.classList.add('active');
     }
 
+    // Initialize Quill Editor
+    const quill = new Quill('#blogEditor', {
+        theme: 'snow',
+        placeholder: 'Write your blog content here...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link', 'blockquote', 'code-block'],
+                ['clean']
+            ]
+        }
+    });
+
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         try {
@@ -303,7 +318,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('createBlogForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const title = document.getElementById('blogTitle').value;
-        const content = document.getElementById('blogContent').value;
+        const content = quill.root.innerHTML;
         const authorSignature = document.getElementById('blogSignature') ? document.getElementById('blogSignature').value : '';
         if (!uploadedImageBase64) {
             alert('Please select an image');
@@ -319,6 +334,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if(res.ok) {
                 document.getElementById('createBlogForm').reset();
+                quill.setContents([]);
                 document.getElementById('imagePreview').style.display = 'none';
                 const placeholder = document.getElementById('uploadPlaceholder');
                 if (placeholder) placeholder.style.display = 'block';

@@ -17,6 +17,12 @@
         .blog-meta div { display: flex; align-items: center; gap: 0.4rem; }
         .blog-image { width: 100%; height: auto; max-height: 500px; object-fit: cover; border-radius: 12px; margin-bottom: 3rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
         .blog-content { font-size: 1.1rem; line-height: 1.8; color: #334155; }
+        .blog-content h1, .blog-content h2, .blog-content h3 { font-family: 'Outfit', sans-serif; color: #0f172a; margin-top: 2rem; margin-bottom: 1rem; }
+        .blog-content p { margin-bottom: 1.25rem; }
+        .blog-content ul, .blog-content ol { margin-bottom: 1.25rem; padding-left: 1.5rem; }
+        .blog-content li { margin-bottom: 0.5rem; }
+        .blog-content blockquote { border-left: 4px solid #3b82f6; padding-left: 1.5rem; margin: 2rem 0; font-style: italic; color: #475569; }
+        .blog-content a { color: #3b82f6; text-decoration: underline; }
         .back-link { display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; color: #3b82f6; font-weight: 500; margin-bottom: 2rem; transition: color 0.2s; }
         .back-link:hover { color: #2563eb; }
     </style>
@@ -48,7 +54,7 @@
                 </div>
             </div>
             <img src="" alt="Blog Cover" class="blog-image" id="dImage">
-            <div class="blog-content" id="dContent" style="white-space: pre-wrap;"></div>
+            <div class="blog-content" id="dContent"></div>
 
             <!-- Sharing Section -->
             <div class="share-article-section" style="margin-top: 3rem; padding: 2rem; background: white; border-radius: 12px; border: 1px solid #e2e8f0;">
@@ -142,7 +148,7 @@
                 document.getElementById('dAuthor').textContent = blog.authorSignature || 'admin@finpulse.works';
                 document.getElementById('dDate').textContent = new Date(blog.createdAt).toLocaleDateString();
                 document.getElementById('dImage').src = blog.image;
-                document.getElementById('dContent').textContent = blog.content || '';
+                document.getElementById('dContent').innerHTML = blog.content || '';
                 
                 document.getElementById('loadingIndicator').style.display = 'none';
                 document.getElementById('blogContentData').style.display = 'block';

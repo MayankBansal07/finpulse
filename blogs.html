@@ -347,7 +347,13 @@
                 container.innerHTML = '';
                 blogs.forEach(blog => {
                     const date = new Date(blog.createdAt).toLocaleDateString();
-                    const snippet = blog.content ? (blog.content.substring(0, 100) + '...') : '';
+                    
+                    // Strip HTML tags for the text snippet
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = blog.content || '';
+                    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+                    const snippet = plainText.substring(0, 100) + '...';
+                    
                     const imageUrl = blog.image || (blog.imagePublicId ? `https://res.cloudinary.com/dbzyykpgp/image/upload/${blog.imagePublicId}` : 'assets/finpulse_logo.jpg');
                     
                     const card = document.createElement('div');

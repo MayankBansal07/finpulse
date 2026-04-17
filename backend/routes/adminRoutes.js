@@ -163,17 +163,26 @@ router.post('/blogs', protect, admin, async (req, res) => {
     
     // If image is a base64 string, upload to Cloudinary
     if (image && image.startsWith('data:image')) {
-      console.log('Detected Base64 image, uploading to Cloudinary...');
-      image = await uploadImage(image);
-      console.log('Upload successful:', image);
+      console.log(`[Blog] Attempting Cloudinary upload for: "${title}"`);
+      try {
+        image = await uploadImage(image);
+        console.log(`[Blog] Cloudinary Success: ${image}`);
+      } catch (uploadErr) {
+        console.error('[Blog] Cloudinary Upload FAILED:', uploadErr.message);
+        return res.status(500).json({ 
+          message: 'Failed to upload image to Cloudinary. Check your server environment variables.', 
+          error: uploadErr.message 
+        });
+      }
     }
 
     const blog = await Blog.create({ title, content, image, authorId: req.user._id, authorSignature });
     await Activity.create({ userEmail: req.user.email, role: 'admin', action: 'Created Blog' });
+    console.log(`[Blog] Created successfully: ${blog._id}`);
     res.status(201).json(blog);
   } catch (error) {
-    console.error('Blog creation error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('[Blog] Creation ERROR:', error.message);
+    res.status(500).json({ message: 'Server error during blog creation', error: error.message });
   }
 });
 
